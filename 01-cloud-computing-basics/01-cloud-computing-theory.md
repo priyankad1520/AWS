@@ -425,7 +425,8 @@ This is one of the **most important AWS concepts**. AWS and you share responsibi
 
 **Q: What is elasticity vs scalability?**
 > Scalability is the ability to handle more load by adding resources (scale up/out). Elasticity is automatic scaling — the system automatically adds resources under load and removes them when load drops, optimizing cost.
-
+Scalability → Can we scale? (Yes. It may be manual or automatic.)
+Elasticity → Does it automatically scale when traffic changes? 
 ---
 
 *Notes by ITkannadigaru | AWS Certification Series 2026*
