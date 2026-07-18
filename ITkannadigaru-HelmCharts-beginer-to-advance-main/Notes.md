@@ -83,24 +83,35 @@ helm install myapp-prod ./chart -f values-prod.yaml
 ```
 
 
-2. Why we need in kubernetes..?
+#### 2. Why we need in kubernetes..?
 Without Helm, you would have to manually define Kubernetes resources for each application, and managing these resources can become quite complex, especially as your app grows or as you deploy multiple apps with similar configurations. 
+
 **Here’s why Helm is useful:**
+
 **Simplifies Deployment:** You can deploy complex applications with just a single command (helm install).
+
 **Version Control:** Helm charts allow you to version-control the deployments, which is important when you need to upgrade or roll back releases.
+
 **Reuse:** Helm charts are reusable and shareable. You can either use pre-existing charts from repositories like Helm Hub or create your own.
+
 **Configuration Management:** Helm provides easy ways to manage configuration changes by using values files (values.yaml), so you don’t need to modify your Kubernetes resource definitions directly.
 
-3. How helm chart will help us to manage k8s
+#### 3. How helm chart will help us to manage k8s
 Helm provides a streamlined approach to managing Kubernetes applications by:
+
 **Packaging:** Helm allows you to package your Kubernetes applications and manage them as a unit. This reduces duplication and simplifies deployment.
+
 **Dependency Management:** Helm charts can declare dependencies on other charts, making it easy to deploy multi-component applications (e.g., a web application with a backend database).
+
 **Release Management:** Helm allows you to track different "releases" of an application. Each release has its own configuration, and Helm can roll back to a previous version if something goes wrong.
+
 **Templating:** Helm uses templates to dynamically generate Kubernetes manifests. You can use variables in your chart’s YAML files and provide values at the time of deployment to customize the setup.
+
 **Upgrade and Rollback:** Helm supports easy upgrades and rollbacks. You can roll back to any previous release version with a simple command if the current deployment fails.
+
 **Configuration Management:** Helm allows you to manage configuration changes easily by using values files, which can be customized at the time of deployment.
 
-4. How to install helm chart.?
+#### 4. How to install helm chart.?
    1. Install Helm on your local machine:
    You can install Helm using a package manager like Homebrew (macOS) or download it directly for your operating system.
 
