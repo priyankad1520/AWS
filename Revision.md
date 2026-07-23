@@ -1,4 +1,4 @@
-1. How is the Kubernetes (EKS) cluster setup done?
+### 1. How is the Kubernetes (EKS) cluster setup done?
 
 In our project, we use Terraform to create the complete EKS infrastructure.
 
@@ -14,7 +14,7 @@ Finally, we deploy applications using Helm through the Jenkins CI/CD pipeline, v
 
 The best practice is to automate the entire cluster setup using Terraform so the environment is consistent, repeatable, and easy to manage.
 
-In our project, we worked on Kubernetes migration and cost optimization together.
+### 2. how do you worked on Kubernetes migration and cost optimization together.
 
 First, we analyzed the existing application to understand its dependencies, resource usage, and whether it was suitable for Kubernetes. Then, we containerized the application using Docker and stored the images in Amazon ECR.
 
