@@ -119,3 +119,147 @@ This is a trick interview question.
 >
 > **The best practice is to follow the principle of least privilege by giving users only the permissions they need to perform their job.**
 
+That's a very common follow-up in interviews.
+
+---
+
+## **How does AWS Transit Gateway work?**
+
+"Think of **Transit Gateway** as a **central router**.
+
+Instead of creating direct connections between every VPC, each VPC creates **only one connection** to the Transit Gateway, called a **Transit Gateway Attachment**.
+
+When an EC2 instance in **VPC A** wants to communicate with an EC2 instance in **VPC C**, the traffic flows like this:
+
+**EC2 in VPC A → VPC A Route Table → Transit Gateway → Transit Gateway Route Table → VPC C Attachment → VPC C Route Table → EC2 in VPC C.**
+
+The Transit Gateway checks its route table to determine which VPC attachment should receive the traffic and forwards it accordingly."
+
+Absolutely. This is actually the kind of architecture a **5+ years DevOps Engineer** should be able to explain. I'll use AWS + EKS + Zoom-like microservices as an example.
+
+# Complete AWS EKS Architecture (Zoom-like Application)
+
+```text
+                                   Internet
+                                       │
+                               Route 53 (DNS)
+                                       │
+                          --------------------------
+                          │                        │
+                    api.zoom.com            media.zoom.com
+                          │                        │
+                          ▼                        ▼
+                  Application LB (ALB)     Network LB (NLB)
+                    (Public Subnet)         (Public Subnet)
+                          │                        │
+                  Internet Gateway         Internet Gateway
+                          │                        │
+          ===================================================
+                          AWS VPC (10.0.0.0/16)
+          ===================================================
+
+          Public Subnet-A                 Public Subnet-B
+          ----------------               ----------------
+          • ALB                          • ALB
+          • NLB                          • NLB
+          • NAT Gateway                  • NAT Gateway
+
+                    │                           │
+                    └──────────────┬────────────┘
+                                   │
+
+                    Private Subnet-A (EKS Nodes)
+                    ----------------------------
+                    • Worker Node 1
+                    • kube-proxy
+                    • CNI
+                    • Pods
+
+                      ├── Authentication Service
+                      ├── Meeting Service
+                      ├── Chat Service
+                      ├── User Service
+
+                    Private Subnet-B (EKS Nodes)
+                    ----------------------------
+                    • Worker Node 2
+                    • kube-proxy
+                    • CNI
+                    • Pods
+
+                      ├── Audio Service
+                      ├── Video Service
+                      ├── Notification Service
+                      ├── Recording Service
+
+                                   │
+                    ClusterIP Services
+                                   │
+                           Kubernetes Ingress
+                                   │
+                       AWS Load Balancer Controller
+
+------------------------------------------------------------
+
+Private Database Subnet
+
+• Amazon RDS
+• ElastiCache (Redis)
+
+------------------------------------------------------------
+
+Private AWS Services or VPC EndPoint
+
+• Amazon ECR
+• CloudWatch
+• Secrets Manager
+• S3
+```
+
+---
+
+# How Traffic Flows
+
+## 1. User opens Zoom link
+
+```
+Browser --> Route53 --> api.zoom.com --> Application Load Balancer --> AWS Load Balancer Controller --> Ingress --> Meeting Service
+```
+## 2. User sends a chat message
+
+```
+Browser --> api.zoom.com --> ALB --> Ingress --> Chat Service --> ClusterIP Service --> Chat Pod: Notice that **ALB** handles this because chat uses **HTTP/HTTPS or WebSocket**.
+```
+## 3. User turns on the microphone and camera
+
+Now the application opens another connection. The NLB is preferred because audio and video require low-latency Layer 4 traffic.
+
+```
+Browser --> media.zoom.com --> Network Load Balancer --> Audio Service and Video Service --> Audio Pod and Video Pod
+```
+
+### Why are ALB and NLB in Public Subnets?
+
+Because they are **internet-facing** resources. AWS requires an internet-facing ALB or NLB to be placed in **public subnets**, which have a route to the **Internet Gateway**.
+
+### Why are EKS Worker Nodes in Private Subnets?
+
+For security. We don't want users connecting directly to the Kubernetes nodes or pods. Only the Load Balancers can reach the applications.
+
+### Why do we need a NAT Gateway?
+
+The worker nodes sometimes need internet access to: Pull container images from Amazon ECR. Download operating system updates. Access AWS APIs. Since the nodes are in **private subnets**, they cannot access the internet directly.
+
+So the traffic goes: Private Node --> Route Table --> NAT Gateway --> Internet Gateway --> Internet
+
+The NAT Gateway provides **outbound-only** internet access. It does **not** allow inbound connections from the internet to your private nodes.
+
+### Where does the Ingress Controller run?
+
+The **AWS Load Balancer Controller** runs as pods inside the EKS cluster, typically in the **kube-system** namespace on worker nodes in the **private subnets**.
+
+Its job is to watch Kubernetes **Ingress** resources and automatically create or update the required AWS ALBs.
+
+## Interview Summary (45 seconds)
+"In our project, we deployed the EKS worker nodes in private subnets across multiple Availability Zones for security and high availability. We deployed internet-facing ALBs and NLBs in public subnets, which were connected to the Internet Gateway. The ALB handled HTTP and HTTPS traffic such as login, meeting management, and chat through Kubernetes Ingress and the AWS Load Balancer Controller. The NLB handled low-latency TCP or UDP traffic for audio and video services. All microservices ran as pods behind ClusterIP Services inside the cluster. The worker nodes accessed the internet through a NAT Gateway to pull images from ECR and communicate with AWS services, while databases such as RDS remained in private database subnets. This architecture provided a secure, scalable, and highly available deployment."
+
