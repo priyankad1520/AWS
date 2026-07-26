@@ -384,6 +384,94 @@ aws ssm get-parameter --name /aws/service/ami-amazon-linux-latest/al2023-ami-ker
 **Q: How do you share an AMI with another AWS account?**
 > Use `modify-image-attribute` to add launch permissions for a specific account ID. The other account can then see and launch the AMI. Note: if the AMI uses encrypted snapshots with a customer-managed KMS key, you also need to share the KMS key with the other account.
 
+Absolutely. Here are the **most common interview questions** on **Golden AMIs** with **simple, interview-ready answers**.
+
+---
+
+# 1. What is a Golden AMI?
+
+> **"A Golden AMI is a pre-configured Amazon Machine Image that contains the operating system, required software like Java and Docker, security patches, monitoring agents, and company-standard configurations. It helps us launch EC2 instances with a consistent configuration."**
+
+---
+
+# 2. Why do we create a Golden AMI?
+
+> **"We create a Golden AMI to reduce server provisioning time, maintain consistency across all EC2 instances, eliminate manual installation, and ensure every server follows the company's standard configuration."**
+
+---
+
+# 3. How do you create a Golden AMI?
+
+> **"First, we launch a base EC2 instance. Then we install the required software such as Java, Docker, CloudWatch Agent, and security patches. After validating everything, we create an AMI from that EC2 instance. We then use this AMI to launch new EC2 instances."**
+
+---
+
+# 4. What do you install before creating the Golden AMI?
+
+> **"We install the operating system updates, Java, Docker, monitoring agents like CloudWatch Agent, the SSM Agent, security patches, and any standard software required by the project."**
+
+---
+
+# 5. Where do you use a Golden AMI?
+
+> **"We use Golden AMIs in Launch Templates, Auto Scaling Groups, and whenever we need to launch new EC2 instances with a standard configuration."**
+
+---
+
+# 6. Can one Golden AMI be used to create multiple EC2 instances?
+
+> **"Yes. Once the Golden AMI is created, we can launch any number of EC2 instances using the same AMI ID."**
+
+---
+
+# 7. Can you modify a Golden AMI?
+
+> **"No. An AMI is immutable. If we need changes, we launch an EC2 instance from the existing AMI, make the required updates, and create a new version of the Golden AMI."**
+
+---
+
+# 8. What happens if you upgrade Docker in the Golden AMI?
+
+> **"The updated Golden AMI is used only for new EC2 instances. Existing EC2 instances are not updated automatically."**
+
+---
+
+# 9. How do you update existing EC2 instances?
+
+> **"We can use tools like Ansible or AWS Systems Manager to update existing EC2 instances. Alternatively, we can replace the old instances with new ones launched from the latest Golden AMI."**
+
+---
+
+# 10. Why not use only Ansible instead of a Golden AMI?
+
+> **"Ansible is used to manage and update existing servers, whereas a Golden AMI provides a standard base image for launching new servers. In production, we typically use both together."**
+
+---
+
+# 11. What is the difference between a normal AMI and a Golden AMI?
+
+> **"A normal AMI contains only the basic operating system, whereas a Golden AMI includes the operating system along with pre-installed software, security patches, monitoring agents, and company-standard configurations."**
+
+---
+
+# 12. How do Auto Scaling Groups use a Golden AMI?
+
+> **"The Auto Scaling Group uses the AMI ID configured in the Launch Template. Whenever scaling occurs, it launches new EC2 instances from the Golden AMI."**
+
+---
+
+## ⭐ Most Important Interview Answer (Remember This)
+
+If an interviewer asks:
+
+> **"Why do companies create Golden AMIs?"**
+
+Say:
+
+> **"To standardise server provisioning. Every EC2 instance launches with the same operating system, software, security patches, and configurations, which reduces provisioning time, avoids manual errors, and ensures consistency across environments."**
+
+This one answer alone covers the main purpose of Golden AMIs and is one of the most frequently asked interview questions.
+
 ---
 
 *Notes by ITkannadigaru | AWS Certification Series 2026*
