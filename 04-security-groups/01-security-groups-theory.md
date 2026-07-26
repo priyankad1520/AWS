@@ -133,7 +133,8 @@ the response on port 80 is still permitted!
 ---
 
 ## 4. Security Groups vs NACLs
-
+> **Security Group:** Instance level, Stateful, Allow rules only and Response traffic allowed automatically	
+> **Network ACL:** Subnet level, Stateless, Allow and Deny rules and Inbound and outbound rules must both be configured
 This is a **very common interview question**. Know the differences thoroughly.
 
 | Feature | Security Group | NACL |
