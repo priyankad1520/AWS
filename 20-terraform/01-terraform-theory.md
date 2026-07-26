@@ -551,7 +551,9 @@ resource "aws_instance" "app" {
 ---
 
 ## 10. Terraform Workspaces
+> A Terraform Workspace is a feature that allows us to manage multiple environments, such as Development, QA, and Production, using the same Terraform configuration while keeping each environment's Terraform state file separate.
 
+we can manage multiple environments without Terraform Workspaces. We can create separate Terraform directories or projects for Development, QA, and Production, and configure each one with its own backend in S3 so that each environment has a separate state file. In our project, we used Workspaces because the infrastructure across environments was very similar, allowing us to reuse the same Terraform code while keeping the state files isolated. If the environments had significantly different infrastructure, I would prefer separate Terraform configurations because they are easier to maintain and avoid excessive workspace-specific conditions.
 ```bash
 # Workspaces allow multiple state files in one config
 terraform workspace list           # List workspaces
