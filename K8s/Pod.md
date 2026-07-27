@@ -241,3 +241,345 @@
 * **Control Plane (Head Office)** → plans, manages, monitors.
 * **Worker Nodes (Branch Offices)** → execute the work.
 * **Pods (Workstations)** → where containers actually run.
+## Kubernetes Architecture – Top 15 Interview Notes
+
+### 1. What happens when you run `kubectl apply -f <file>.yaml`?
+
+* Request goes to the **API Server**.
+* API Server stores the desired state in **etcd**.
+* **Scheduler** selects the best worker node.
+* **Kubelet** pulls the image and starts the container inside a Pod.
+
+### 2. What if the Scheduler is down?
+
+* New Pods cannot be scheduled.
+* Existing Pods continue running.
+* New deployments and autoscaling won't work.
+
+### 3. What happens if etcd crashes?
+
+* Kubernetes cannot read or write cluster state.
+* Control Plane becomes unstable.
+* Cluster won't function properly until etcd is restored.
+
+### 4. Can a Pod be scheduled without Kubelet?
+
+* **No.**
+* Kubelet runs and manages Pods on the node.
+* If Kubelet is down, the Pod won't start even if Scheduler assigns it.
+
+### 5. Role of Kube-proxy
+
+* Handles network traffic between Pods and Services.
+* Configures IP rules.
+* Performs load balancing to the correct Pod.
+
+### 6. How does API Server authenticate requests?
+
+* **Authentication** → Who are you?
+* **Authorization** → What can you do?
+* **Admission Controllers** → Validate the request before accepting it.
+
+### 7. How do Control Plane and Worker Nodes communicate?
+
+* Use **TLS certificates**.
+* Communication happens through the **API Server endpoint**.
+* Kubelet securely communicates with the API Server.
+
+---
+
+### 8. Can one node run both Control Plane and Worker components?
+
+* **Yes**, in Minikube or development environments.
+* **Production** → keep them separate for better performance and security.
+
+---
+
+### 9. What happens if a Worker Node goes down?
+
+* Controller Manager detects the failure.
+* Node becomes **NotReady**.
+* Pods are rescheduled to healthy nodes if possible.
+
+### 10. What stores the Kubernetes cluster state?
+
+* **etcd**.
+* Distributed key-value database.
+* Stores complete cluster configuration and state.
+
+### 11. What happens during a Rolling Update?
+
+* Deployment gradually replaces old Pods with new Pods.
+* Ensures zero downtime.
+* Scheduler places new Pods.
+* Kubelet starts them.
+
+### 12. How does Scheduler choose a node?
+
+* Checks CPU and Memory availability.
+* Checks Taints and Tolerations.
+* Checks Affinity and Anti-affinity rules.
+* Selects the best-fit worker node.
+
+### 13. Why is API Server the single source of truth?
+
+* All Kubernetes components communicate through the API Server.
+* Reads and writes cluster state to **etcd**.
+* No operation happens without the API Server.
+
+### 14. Can Kubelet restart a crashed container?
+
+* **Yes.**
+* Kubelet monitors container health.
+* Restarts the container based on the Pod's **Restart Policy**.
+
+### 15. What happens if you manually delete a Pod?
+
+* **ReplicaSet** detects the missing Pod.
+* Creates a new Pod automatically.
+* Maintains the desired number of replicas.
+These are the notes in the same style as your previous ones—short, interview-friendly, without adding extra information.
+
+---
+
+# Pod
+
+* **Pod** → smallest and most basic deployable unit in Kubernetes.
+* Represents one or more containers.
+* Containers share the same network namespace, storage volumes, and lifecycle.
+* Think of a Pod as a wrapper around the application's containers.
+
+# Pod Lifecycle
+
+### Pending
+
+* Pod definition accepted, scheduling in progress.
+* Kubernetes has received the Pod specification but has not scheduled or started it.
+* Possible reasons → insufficient node resources, image pulling, PVC provisioning, YAML misconfiguration.
+
+### Running
+
+* Pod scheduled, containers are running.
+* Suitable worker node assigned.
+* Containers initialized and executing.
+* Can check logs, port-forward, debug, and perform load testing.
+
+### Succeeded
+
+* Container completed successfully.
+* Used mainly for Jobs and CronJobs.
+* Examples → backup scripts, report generation, data migration.
+
+### Failed
+
+* Container terminated with an error.
+* Possible reasons → application error, configuration issue, port conflict, failed Init Container.
+* Troubleshooting → `kubectl logs`, `kubectl describe pod`.
+
+### Unknown
+
+* Node unreachable or state not reported.
+* Control Plane cannot communicate with the Worker Node.
+* Usually caused by network issues or node failure.
+
+# Init Container
+
+* **Init Container** → helper container that runs before the main application container.
+* Runs only once.
+* Used for setup tasks before the application starts.
+
+# Why Init Container?
+
+* Download configuration files.
+* Wait for another service to become ready.
+* Perform database migration.
+* Execute setup tasks before starting the application.
+* Keeps the main application container clean and lightweight.
+
+# Init Container Workflow
+
+* Kubernetes runs Init Containers one by one.
+* Starts the first Init Container.
+* Waits until it completes successfully.
+* Starts the next Init Container.
+* After all Init Containers finish, the main application container starts.
+* Init Containers never run at the same time as the main container.
+
+# Real-Time Example
+
+* Java application depends on MySQL.
+* Init Container waits until MySQL is reachable on port **3306**.
+* After the database is ready, Kubernetes starts the main application container.
+* Prevents the application from failing because the database is not yet available.
+
+# Important Points
+
+* If an **Init Container fails**, the main application container will not start.
+* Kubernetes keeps retrying the Init Container until it succeeds or the issue is fixed.
+## Multi-Container Pod
+
+* **Multi-Container Pod** → single Kubernetes Pod running two or more containers.
+* Containers share the same network, storage volumes, and lifecycle.
+* Containers work together as one unit.
+* Each container has a specific responsibility.
+* Used to separate responsibilities into smaller, reusable parts.
+
+## Sidecar Pattern
+
+* One container runs the main application.
+* Another container runs alongside it to assist.
+* Shares the same network and storage.
+* Runs as long as the main application is running.
+* **Examples** → log collection, monitoring, backup, configuration sync.
+
+## Ambassador Pattern
+
+* Helper container acts as a proxy between the application and external services.
+* Main application communicates with **localhost**.
+* Ambassador handles communication with external services.
+* Can manage security, failover, connection management, or request routing.
+* Keeps the application simple by hiding external communication details.
+
+# Basic Pod YAML Structure
+
+**apiVersion:** Specifies the Kubernetes API version.
+
+**kind:** Defines the Kubernetes object type, such as **Pod** or **Deployment**.
+
+**metadata:** Stores identifying information.
+
+**name:** Unique name of the Pod within the namespace.
+
+**labels:** Key-value pairs used for grouping and selecting resources.
+
+**spec:** Defines the desired state and configuration of the Pod.
+
+**containers:** List of containers running inside the Pod.
+
+**name:** Name of the container.
+
+**image:** Docker image used by the container.
+
+**ports:** Container ports to expose.
+
+**env:** Environment variables for the container.
+
+**volumeMounts:** Mount points for shared storage.
+
+**resources:** CPU and memory requests and limits.
+
+**initContainers (Optional)**: Helper containers that run before the main container starts.
+
+**volumes *(Optional)**: Shared storage accessible by all containers in the Pod.
+
+**restartPolicy:**
+
+* Defines what happens when a container exits.
+
+* **Always** *(Default)* → restarts the container every time it exits.
+
+* **OnFailure** → restarts only if the container exits with a non-zero exit code.
+
+* **Never** → never restarts the container.
+
+## Pod Networking in Kubernetes
+
+### Pod-to-Pod Communication
+
+* Pods communicate directly using their IP addresses.
+* No special configuration required.
+* Default Kubernetes behaviour.
+* **CoreDNS** resolves DNS names.
+
+### Pod-to-Service Communication
+
+* **Service** provides a stable endpoint for Pods.
+* Pods communicate with the **Service**, not directly with Pod IPs.
+* Service forwards traffic to the appropriate Pod.
+
+### Pod-to-External Communication
+
+* Pods can access external websites and APIs by default.
+* Access can be restricted using **Network Policies**.
+
+### CNI (Container Network Interface)
+
+* **CNI** sets up Pod networking.
+* Assigns Pod IP addresses.
+* Configures routing.
+* Enforces network policies.
+
+# Pod Affinity
+
+* **Pod Affinity** → schedules Pods on the same node as specific Pods.
+* Used when Pods should stay together.
+* Example → Logging Agent and Backend Pod on the same node.
+* Uses **requiredDuringSchedulingIgnoredDuringExecution**.
+* Scheduler places the Pod only where the matching Pod already exists.
+* **Label Selector** identifies matching Pods.
+* **Topology Key** decides the scheduling level, usually the node.
+
+# Pod Anti-Affinity
+
+* **Pod Anti-Affinity** → prevents Pods from running on the same node.
+* Used to improve high availability.
+* Example → Backend replicas distributed across different nodes.
+* Uses **requiredDuringSchedulingIgnoredDuringExecution**.
+* Scheduler avoids placing Pods on nodes with matching Pods.
+* **Label Selector** identifies matching Pods.
+* **Topology Key** ensures Pods are spread across different nodes.
+
+# Real-Time Pod YAML Scenario
+
+### Requirement
+
+* Deploy a Java Order Service.
+* Wait for MySQL before starting.
+* Write logs to a shared volume.
+* Stream logs using a Sidecar Container.
+* Restart automatically on failure.
+* Prefer running on the same node as **app=payment-service**.
+* Debug using standard **kubectl** commands.
+
+## Step 1 – Basic Pod Structure
+
+* Define **apiVersion**, **kind**, **metadata**, **labels**, and **spec**.
+* Foundation for adding containers, volumes, and affinity rules.
+
+## Step 2 – Init Container
+
+* Create **wait-for-db** Init Container.
+* Uses **BusyBox** image.
+* Continuously checks MySQL on port **3306**.
+* Starts the main application only after the database is available.
+
+## Step 3 – Shared Volume
+
+* Create **log-volume** using **emptyDir**.
+* Shared storage for log files between containers.
+
+## Step 4 – Main Application Container
+
+* Java application container.
+* Runs on **port 8080**.
+* Writes logs to **app.log**.
+* Mounts the shared log volume.
+
+## Step 5 – Sidecar Container
+
+* Log forwarder using **BusyBox**.
+* Continuously tails **app.log**.
+* Streams logs to **stdout**.
+* Uses the same shared log volume.
+
+## Step 6 – Restart Policy
+
+* **restartPolicy: Always**
+* Automatically restarts containers if they crash.
+
+## Step 7 – Pod Affinity
+
+* Uses **preferredDuringSchedulingIgnoredDuringExecution**.
+* Prefers scheduling on the same node as **app=payment-service**.
+* **Topology Key** applies the preference at the node level.
+* Improves performance and shared resource access.
