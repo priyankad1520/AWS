@@ -10,9 +10,6 @@
 >
 > This makes the pipeline reusable, reduces maintenance, and gives the development team the flexibility to build any branch using a single Jenkins job."
 
-
-# **Jenkins Pipeline Example**
-
 ```groovy
 pipeline {
     agent any
@@ -72,10 +69,6 @@ Excellent. I understand exactly what you want.
 > Based on the selected environment, we used a **script block** with an **if-else** condition to assign the appropriate Docker image tag. For example, if the environment is **Dev**, we use **my-app-dev**. If it's **Stage**, we use **my-app-staging**. Otherwise, for **Production**, we use **my-app-latest**.
 >
 > Then we build, tag, and push the Docker image using that dynamically selected tag. This approach keeps a single pipeline reusable across all environments, reduces maintenance, and minimizes deployment errors."
-
----
-
-# **Jenkins Pipeline Example**
 
 ```groovy
 pipeline {
@@ -152,8 +145,6 @@ pipeline {
 >
 > This prevents unnecessary builds from running after a failed pipeline and ensures that issues are resolved before the next execution. It's useful in production pipelines where we want to maintain build stability."
 
-# **Jenkins Pipeline Example**
-
 ```groovy
 pipeline {
     agent any
@@ -219,8 +210,6 @@ pipeline {
 >
 > This is a simple and effective way to protect the Production environment from accidental deployments while allowing developers to work freely on their branches."
 
-# **Jenkins Pipeline Example**
-
 ```groovy id="4x71kt"
 pipeline {
     agent any
@@ -283,7 +272,6 @@ pipeline {
 >
 > This configuration is commonly used for scheduled CI/CD health checks, automated testing, report generation, monitoring jobs, or any recurring operational tasks without requiring manual intervention."
 > 
-# **Jenkins Pipeline Example**
 
 ```groovy id="fh2d7k"
 pipeline {
@@ -340,9 +328,6 @@ pipeline {
 >
 > This type of scheduling is useful when we want to avoid running CI jobs during a maintenance window or when developers are performing testing on shared environments."
 
-
-# **Jenkins Pipeline Example**
-
 ```groovy id="6z5h2p"
 pipeline {
     agent any
@@ -396,8 +381,6 @@ pipeline {
 > Similarly, for the **Frontend Build** stage, I use **`changeset 'frontend/**/*.js'`**, so the stage runs only when **.js** files are modified inside the **frontend** directory.
 >
 > If both Java and JavaScript files are changed, both stages execute. If neither pattern matches, Jenkins automatically skips both stages. This approach improves pipeline performance by building only the components affected by the latest changes."
-
-# **Jenkins Pipeline Example**
 
 ```groovy id="1d7x9m"
 pipeline {
@@ -462,8 +445,6 @@ pipeline {
 >
 > By combining both triggers, we ensure that the pipeline runs on a fixed daily schedule and also responds automatically whenever new code changes are available."
 
-# **Jenkins Pipeline Example**
-
 ```groovy id="8j4m2n"
 pipeline {
     agent any
@@ -522,28 +503,18 @@ pipeline {
 >
 > This is more efficient than polling because Jenkins doesn't repeatedly check the repository. Instead, GitHub notifies Jenkins only when there is a new commit."
 
----
-
-# **Jenkins Configuration**
-
-**In Jenkins:**
-
+**Jenkins Configuration: In Jenkins:**
 * Go to **Job → Configure**
 * Under **Build Triggers**
 * Enable **GitHub hook trigger for GITScm polling**
 
----
-
 **In GitHub:**
-
 * Go to **Repository → Settings → Webhooks**
 * Click **Add webhook**
 * Enter the **Jenkins Payload URL**
 * Select **Content-Type: application/json**
 * Choose the **Push** event
 * Save the webhook
-
----
 
 **Q1. What is a webhook?**
 > "A webhook is an HTTP callback mechanism where one application automatically sends a request to another application when a specific event occurs, such as a Git push."
@@ -574,8 +545,6 @@ pipeline {
 > Here, **0** represents the minute, **8** represents **8:00 AM** in 24-hour format, the two asterisks mean **every day of the month** and **every month**, and **1-5** represents **Monday to Friday**.
 >
 > This configuration ensures the pipeline runs automatically every weekday at **8:00 AM**, while skipping weekends. It's commonly used for daily health checks, automated testing, scheduled builds, and report generation."
-
-# **Jenkins Pipeline Example**
 
 ```groovy id="j9m3wp"
 pipeline {
