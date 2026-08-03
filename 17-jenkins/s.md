@@ -1,4 +1,4 @@
-**1. The team wants to use the Git branch as a parameter while triggering the build and use that parameter during the Git checkout. How would you implement this in Jenkins?**
+#### **1. The team wants to use the Git branch as a parameter while triggering the build and use that parameter during the Git checkout. How would you implement this in Jenkins?**
 
 > "Yes, we can achieve this using **Jenkins String Parameters**.
 >
@@ -60,7 +60,7 @@ Excellent. I understand exactly what you want.
 
 ---
 
-**2. How would you design your Jenkins pipeline where three different environments like Dev, Stage, and Prod require three different Docker image tags?**
+#### **2. How would you design your Jenkins pipeline where three different environments like Dev, Stage, and Prod require three different Docker image tags?**
 
 > "In our project, we had a similar requirement where the application was deployed to **Dev**, **Stage**, and **Production**, and each environment required a different Docker image tag.
 >
@@ -134,7 +134,7 @@ pipeline {
 
 ---
 
-**3. How would you configure a Jenkins pipeline to run only if the previous build was successful?**
+#### **3. How would you configure a Jenkins pipeline to run only if the previous build was successful?**
 
 
 > "In Jenkins, we can achieve this by adding a **pre-check stage** at the beginning of the pipeline. Inside that stage, we use a **script block** to check the status of the previous build.
@@ -199,7 +199,7 @@ pipeline {
 
 ---
 
-**4. How do you configure a Jenkins pipeline so that the Production deployment stage runs only when the code is merged into the `main` branch?**
+#### **4. How do you configure a Jenkins pipeline so that the Production deployment stage runs only when the code is merged into the `main` branch?**
 
 
 > "In Jenkins Declarative Pipeline, we can achieve this using the **`when`** condition.
@@ -262,7 +262,7 @@ pipeline {
 
 ---
 
-**5. As a DevOps engineer, how would you configure a Jenkins pipeline to trigger automatically every weekday (Monday to Friday) at 9:00 AM and 5:00 PM?**
+#### **5. As a DevOps engineer, how would you configure a Jenkins pipeline to trigger automatically every weekday (Monday to Friday) at 9:00 AM and 5:00 PM?**
 
 > "In Jenkins, we can schedule automatic builds using the **`triggers`** block with a **cron expression**.
 >
@@ -318,7 +318,7 @@ pipeline {
 
 ---
 
-**6. As a DevOps engineer, how would you configure a Jenkins pipeline to run every hour but skip the 1:00 PM execution?**
+#### **6. As a DevOps engineer, how would you configure a Jenkins pipeline to run every hour but skip the 1:00 PM execution?**
 
 > "In Jenkins, I would use the **`triggers`** block with a **cron expression** to schedule the job.
 >
@@ -372,7 +372,7 @@ pipeline {
 
 ---
 
-**7. How would you configure a Jenkins pipeline in a monorepo so that the Backend build runs only when Java files change, the Frontend build runs only when JavaScript files change, both run if both change, and both are skipped if neither changes?**
+#### **7. How would you configure a Jenkins pipeline in a monorepo so that the Backend build runs only when Java files change, the Frontend build runs only when JavaScript files change, both run if both change, and both are skipped if neither changes?**
 
 > "In a monorepo, we don't want to build every component for every commit because it increases the pipeline execution time. Instead, we can use the **`when`** directive with the **`changeset`** condition.
 >
@@ -433,7 +433,7 @@ pipeline {
 
 ---
 
-**8. Can we define multiple triggers in a Jenkins pipeline? If yes, how would you configure a pipeline to run every 30 minutes when there are SCM changes, and also run every day at 3:00 AM regardless of changes?**
+#### **8. Can we define multiple triggers in a Jenkins pipeline? If yes, how would you configure a pipeline to run every 30 minutes when there are SCM changes, and also run every day at 3:00 AM regardless of changes?**
 
 > "Yes, Jenkins allows us to configure multiple triggers in the same pipeline.
 >
@@ -491,7 +491,7 @@ pipeline {
 
 ---
 
-**9. How do you automatically trigger a Jenkins pipeline whenever code is pushed to a Git repository?**
+#### **9. How do you automatically trigger a Jenkins pipeline whenever code is pushed to a Git repository?**
 
 > "The recommended approach is to use a **Git webhook**.
 >
@@ -536,7 +536,7 @@ pipeline {
 
 ---
 
-**10. How would you configure a Jenkins pipeline to run automatically every weekday (Monday to Friday) at 8:00 AM?**
+#### **10. How would you configure a Jenkins pipeline to run automatically every weekday (Monday to Friday) at 8:00 AM?**
 
 > "In Jenkins, I would use the **`triggers`** block with a **cron expression** to schedule the pipeline.
 >
@@ -588,3 +588,118 @@ pipeline {
 
 **Q6. In which real-world scenarios would you schedule a weekday-only Jenkins job?**
 > "I would use it for daily CI builds, health checks, automated regression tests, security scans, report generation, or any business-hour automation that doesn't need to run on weekends."
+
+---
+
+#### **11. How would you configure a Jenkins pipeline to check the Git repository every 15 minutes and trigger a build only when there is a new commit?**
+
+> "In Jenkins, I would use the **`pollSCM`** trigger inside the **`triggers`** block.
+>
+> I would configure it as **`pollSCM('H/15 * * * *')`**, which tells Jenkins to check the Git repository approximately every **15 minutes**.
+>
+> If Jenkins detects a new commit since the last successful build, it automatically triggers the pipeline. If there are no changes, the build is not triggered.
+>
+> The **`H`** stands for **Hash**. Jenkins uses it to distribute polling times across different jobs so that multiple pipelines don't check the repository at the exact same minute, helping reduce the load on the Jenkins server.
+>
+> This approach is useful when webhooks are not available or cannot be configured."
+
+
+```groovy id="n7v2qx"
+pipeline {
+    agent any
+
+    triggers {
+        pollSCM('H/15 * * * *')
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/company/myapp.git',
+                    branch: 'main'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+    }
+}
+```
+
+**Q1. What is `pollSCM` in Jenkins?**
+> "The `pollSCM` trigger periodically checks the source code repository and starts the pipeline only if it detects new commits."
+
+**Q2. What does `H/15 * * * *` mean?**
+> "It tells Jenkins to poll the Git repository approximately every **15 minutes** using a hashed schedule to distribute the load across jobs."
+
+**Q3. What is the purpose of the `H` in the cron expression?**
+> "The `H` stands for **Hash**. It distributes polling times across different jobs so they don't all execute at the same minute."
+
+**Q4. Will Jenkins trigger a build every 15 minutes with `pollSCM`?**
+> "No. Jenkins checks the repository every 15 minutes, but it triggers a build only if it detects new changes."
+
+**Q5. What is the difference between `pollSCM` and a Git webhook?**
+> "With `pollSCM`, Jenkins periodically checks the repository for changes. With a Git webhook, the Git server immediately notifies Jenkins whenever a new commit is pushed, making it more efficient."
+
+**Q6. When would you choose `pollSCM` instead of a webhook?**
+> "I would use `pollSCM` when webhooks cannot be configured due to network restrictions, firewall limitations, or repository permissions. Otherwise, webhooks are generally the preferred approach because they trigger builds immediately after a commit."
+
+---
+
+#### **12. How would you configure a Jenkins pipeline to trigger automatically every day at exactly 2:00 AM?**
+
+> "In Jenkins, I would use the **`triggers`** block with a **cron expression** to schedule the pipeline.
+>
+> For this requirement, I would configure the cron expression as **`0 2 * * *`**.
+>
+> Here, **0** represents the **0th minute**, **2** represents **2:00 AM** in 24-hour format, and the three asterisks indicate **every day of the month**, **every month**, and **every day of the week**.
+>
+> This configuration automatically triggers the pipeline every day at **2:00 AM**. It's commonly used for nightly builds, backups, security scans, database maintenance, and automated regression testing when system usage is low."
+
+
+```groovy id="k3v8pq"
+pipeline {
+    agent any
+
+    triggers {
+        cron('0 2 * * *')
+    }
+
+    stages {
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+    }
+}
+```
+
+**Q1. What does the cron expression `0 2 * * *` mean?**
+> "It schedules the Jenkins pipeline to run every day at exactly **2:00 AM**."
+
+**Q2. Why do teams often schedule jobs at 2:00 AM?**
+> "Because system usage is usually low during that time, making it ideal for resource-intensive tasks like backups, regression tests, security scans, and maintenance jobs."
+
+**Q3. What is the purpose of the `triggers` block?**
+> "The `triggers` block is used to automatically start a Jenkins pipeline based on a schedule or other supported trigger mechanisms."
+
+**Q4. Can we use `H` instead of `0` in the minute field?**
+> "Yes. Using **`H`** allows Jenkins to distribute job execution across different minutes, reducing the chance of multiple jobs starting simultaneously."
+
+**Q5. What is the difference between `cron` and `pollSCM`?**
+> "The `cron` trigger runs the job at a fixed schedule regardless of code changes, whereas `pollSCM` checks the repository periodically and triggers the build only when new commits are detected."
+
+**Q6. In which real-world scenarios have you used a 2:00 AM scheduled job?**
+> "I've used scheduled jobs at **2:00 AM** for nightly builds, automated regression testing, backup tasks, security vulnerability scans, log cleanup, and generating daily operational reports."
