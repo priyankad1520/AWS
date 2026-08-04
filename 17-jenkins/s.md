@@ -703,3 +703,322 @@ pipeline {
 
 **Q6. In which real-world scenarios have you used a 2:00 AM scheduled job?**
 > "I've used scheduled jobs at **2:00 AM** for nightly builds, automated regression testing, backup tasks, security vulnerability scans, log cleanup, and generating daily operational reports."
+---
+#### **13. How would you archive a generated chart or report in Jenkins after every successful build?**
+
+> "In Jenkins, I would use the **`post`** section of the Declarative Pipeline.
+>
+> Inside the **`post`** block, I would define a **`success`** condition so that the artifact is archived only if the build completes successfully.
+>
+> Then I would use the **`archiveArtifacts`** step and specify the path of the generated file, such as a chart, report, or build artifact.
+>
+> I also enable **`fingerprint: true`**, which allows Jenkins to uniquely identify and track that artifact across different builds and downstream pipelines.
+>
+> This ensures that the generated artifacts are safely stored in Jenkins and can be downloaded or referenced later for auditing, troubleshooting, or deployment."
+
+
+```groovy id="a7m4qd"
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Generate Chart') {
+            steps {
+                sh './generate-chart.sh'
+            }
+        }
+    }
+
+    post {
+        success {
+            archiveArtifacts(
+                artifacts: 'reports/chart.html',
+                fingerprint: true
+            )
+        }
+    }
+}
+```
+**Q1. What is the purpose of the `post` block?**
+> "The `post` block defines actions that execute after the pipeline or a stage completes, regardless of whether the build succeeds, fails, or is unstable."
+
+**Q2. Why do we use `post { success { ... } }`?**
+> "It ensures the archive operation runs only when the build is successful, so incomplete or failed build artifacts are not stored."
+
+**Q3. What is `archiveArtifacts` in Jenkins?**
+> "The `archiveArtifacts` step stores build-generated files in Jenkins so they can be accessed or downloaded even after the build has finished."
+
+**Q4. What does `fingerprint: true` do?**
+> "It generates a unique fingerprint for each archived artifact, allowing Jenkins to track the artifact across multiple builds and downstream jobs."
+
+**Q5. What kinds of files can be archived?**
+> "We can archive files such as JARs, WARs, ZIP files, HTML reports, test reports, log files, Docker manifests, Helm charts, and other build outputs."
+
+**Q6. What is the difference between archiving an artifact and publishing it to a repository like Nexus or Artifactory?**
+> "Archived artifacts are stored within Jenkins and are mainly used for build history and troubleshooting. Publishing to Nexus or Artifactory stores versioned artifacts in a centralized repository, making them available for deployments, sharing across teams, and long-term artifact management."
+
+---
+#### **14. How would you automatically clean up the Jenkins workspace after a successful build to save disk space?**
+
+> "In Jenkins, I would use the **`post`** section of the pipeline along with the **`cleanWs()`** step provided by the **Workspace Cleanup Plugin**.
+>
+> Inside the **`post`** block, I would place **`cleanWs()`** under the **`success`** condition so that the workspace is cleaned only after a successful build.
+>
+> I would also set **`deleteDirs: true`** to remove all directories and **`disableDeferredWipeout: true`** to ensure the cleanup happens immediately instead of being deferred.
+>
+> This helps free up disk space, removes temporary build files, and keeps the Jenkins agents clean for future builds."
+
+```groovy id="p8n5xr"
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+    }
+
+    post {
+        success {
+            cleanWs(
+                deleteDirs: true,
+                disableDeferredWipeout: true
+            )
+        }
+    }
+}
+```
+
+**Q1. What is `cleanWs()` in Jenkins?**
+> "The `cleanWs()` step cleans the Jenkins workspace by deleting files and directories created during the build."
+
+**Q2. Why do we place `cleanWs()` inside the `post` block?**
+> "Because the `post` block executes after the pipeline completes, making it the appropriate place for cleanup activities."
+
+**Q3. Why did you use `success` instead of `always`?**
+> "Using `success` ensures the workspace is cleaned only after a successful build. If the build fails, the workspace is preserved for troubleshooting and log analysis."
+
+**Q4. What does `deleteDirs: true` do?**
+> "It removes all directories in the workspace, ensuring a complete cleanup instead of deleting only files."
+
+**Q5. What does `disableDeferredWipeout: true` do?**
+> "It forces Jenkins to delete the workspace immediately instead of scheduling the deletion for a later time."
+
+**Q6. What is the difference between cleaning the workspace and deleting old build history?**
+> "Cleaning the workspace removes files created during the current build from the agent. Deleting old build history removes previous build records, logs, and archived artifacts from the Jenkins controller to free disk space."
+---
+#### **15. How would you configure Jenkins to send an email notification only when a job fails? Which plugin is required?**
+
+> "To send email notifications only when a Jenkins job fails, I use the **Email Extension Plugin (Email-ext Plugin)**.
+>
+> First, I install the **Email Extension Plugin** from **Manage Jenkins → Plugins**. Then I configure the SMTP server, sender email address, and authentication details in **Manage Jenkins → Configure System**.
+>
+> In the Jenkinsfile, I use the **`post`** section and define only the **`failure`** block. Inside that block, I use the **`emailext`** step to send an email to the required recipients with the build details and the Jenkins build URL.
+>
+> This ensures that developers receive email notifications only when the pipeline fails, avoiding unnecessary emails for successful builds."
+
+```groovy id="q2m8zw"
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+    }
+
+    post {
+
+        failure {
+            emailext(
+                to: 'devteam@company.com',
+                subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+The Jenkins build has failed.
+
+Job Name : ${env.JOB_NAME}
+Build No : ${env.BUILD_NUMBER}
+
+Please check the build details below:
+${env.BUILD_URL}
+"""
+            )
+        }
+    }
+}
+```
+
+**Q1. Which plugin is required to send email notifications in Jenkins?**
+> "The **Email Extension Plugin (Email-ext Plugin)** is required for sending customized email notifications."
+
+**Q2. Why do we use the `failure` block inside `post`?**
+> "The `failure` block executes only when the pipeline fails, ensuring email notifications are sent only for failed builds."
+
+**Q3. What Jenkins configuration is required before using `emailext`?**
+> "We need to configure the SMTP server, sender email address, and authentication settings in **Manage Jenkins → Configure System**."
+
+**Q4. What is the advantage of sending emails only on failure?**
+> "It reduces unnecessary notifications and immediately alerts developers when a build requires attention."
+
+**Q5. What information should be included in a failure notification email?**
+> "I usually include the job name, build number, build status, build URL, branch name, and, if possible, the error summary or commit details."
+
+**Q6. Can `emailext` send emails to different recipients based on the build status?**
+> "Yes. We can configure different recipient lists for success, failure, unstable, or other build conditions using separate `post` blocks or `emailext` options."
+---
+#### **16. How would you configure Jenkins to send email notifications for both successful and failed builds? Which plugin is required?**
+
+> "In Jenkins, we use the **Email Extension Plugin (Email-ext Plugin)** to send customized email notifications.
+>
+> First, I configure the SMTP email settings in the Jenkins **Manage Jenkins** section. Then, in the Jenkinsfile, I use the **`post`** block with both **`success`** and **`failure`** conditions.
+>
+> Inside each condition, I call the **`emailext`** step and specify the recipient email address, subject, and email body. I also include the Jenkins build URL so developers can directly access the failed or successful build.
+>
+> This ensures that whenever a build succeeds or fails, the development team receives an automatic email notification with all the necessary details."
+
+```groovy id="m6v2pa"
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+    }
+
+    post {
+
+        success {
+            emailext(
+                to: 'devteam@company.com',
+                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+Build completed successfully.
+
+Job Name : ${env.JOB_NAME}
+Build No : ${env.BUILD_NUMBER}
+
+Build URL:
+${env.BUILD_URL}
+"""
+            )
+        }
+
+        failure {
+            emailext(
+                to: 'devteam@company.com',
+                subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+Build failed.
+
+Job Name : ${env.JOB_NAME}
+Build No : ${env.BUILD_NUMBER}
+
+Build URL:
+${env.BUILD_URL}
+"""
+            )
+        }
+    }
+}
+```
+
+**Q1. Which plugin is used to send email notifications in Jenkins?**
+> "The **Email Extension Plugin (Email-ext Plugin)** is used to send customized email notifications from Jenkins."
+
+**Q2. Why do we use the `post` block for email notifications?**
+> "The `post` block executes after the pipeline completes, making it the ideal place to send success or failure notifications."
+
+**Q3. What is the difference between `mail` and `emailext`?**
+> "The `mail` step provides basic email functionality, whereas `emailext` offers advanced features such as HTML emails, attachments, recipient providers, and customizable email templates."
+
+**Q4. What Jenkins configuration is required before using `emailext`?**
+> "We need to configure the SMTP server, sender email address, and authentication details in **Manage Jenkins → Configure System** before Jenkins can send emails."
+
+**Q5. What information do you usually include in a build notification email?**
+> "I typically include the job name, build number, build status, build URL, branch name, and, if applicable, the commit ID or commit message to help developers quickly identify the build."
+
+**Q6. Can Jenkins send notifications to tools other than email?**
+> "Yes. Jenkins can send notifications to Slack, Microsoft Teams, Google Chat, Discord, PagerDuty, webhooks, and many other tools using their respective plugins or integrations."
+---
+# **17. How would you avoid duplicating Jenkins pipeline code across multiple microservices?**
+
+> "In this scenario, I would use a **Jenkins Shared Library**.
+>
+> Instead of copying the same pipeline code into the Jenkinsfile of all 10 microservices, I would move the common logic—such as **Git checkout**, **Maven build**, **unit testing**, **SonarQube scan**, **artifact archiving**, and **Docker image build**—into a Shared Library.
+>
+> Each microservice's Jenkinsfile then becomes very small and simply calls the required functions from the Shared Library.
+>
+> This approach follows the **Don't Repeat Yourself (DRY)** principle. If I need to update the build process, I make the change only once in the Shared Library, and all microservices automatically use the updated logic. This improves maintainability, consistency, and reduces the chances of configuration errors."
+
+```text
+# Jenkins Shared Library Structure
+(shared-library)
+│
+├── vars/
+│   ├── buildApp.groovy
+│   ├── deployApp.groovy
+│   └── sonarScan.groovy
+│
+├── src/
+│   └── com/company/utils/
+│
+└── resources/
+```
+```groovy id="d4k9pq"
+# Example Shared Library Function
+// vars/buildApp.groovy
+
+def call() {
+    sh 'mvn clean package'
+}
+```
+
+
+```groovy id="y7m2ld"
+# Microservice Jenkinsfile
+@Library('shared-library') _
+
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Build') {
+            steps {
+                buildApp()
+            }
+        }
+    }
+}
+```
+**Q1. What is a Jenkins Shared Library?**
+> "A Jenkins Shared Library is a reusable collection of Groovy scripts and pipeline functions that can be shared across multiple Jenkins pipelines."
+
+**Q2. Why do we use a Shared Library?**
+> "We use a Shared Library to eliminate duplicate pipeline code, improve maintainability, and ensure consistent CI/CD practices across multiple projects."
+
+**Q3. Where is a Shared Library usually stored?**
+> "A Shared Library is typically stored in a separate Git repository and configured globally in Jenkins so that multiple pipelines can access it."
+
+**Q4. What are the main directories in a Jenkins Shared Library?**
+> "The main directories are **`vars/`** for reusable pipeline steps, **`src/`** for Groovy classes and business logic, and **`resources/`** for static files such as templates or configuration files."
+
+**Q5. How do you use a Shared Library in a Jenkinsfile?**
+> "We import it using the `@Library('library-name')` annotation and then call the reusable functions directly inside the pipeline."
+
+**Q6. Can different microservices use different functions from the same Shared Library?**
+> "Yes. Each microservice can call only the functions it needs, such as `buildApp()`, `dockerBuild()`, `sonarScan()`, or `deployApp()`, while sharing the same centralized library."
+
+**Q7. In your project, what did you keep inside the Shared Library?**
+> "In my project, we kept common CI/CD steps such as Git checkout, Maven build, unit testing, SonarQube analysis, Docker image build and push, artifact archiving, Kubernetes deployment, and notification logic inside the Shared Library. Each microservice Jenkinsfile simply called these reusable functions, making the pipelines clean and easy to maintain."
