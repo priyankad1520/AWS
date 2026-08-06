@@ -46,15 +46,12 @@ A senior engineer should think about several possibilities, such as:
 
 **Common Reasons an Agent Goes Offline**
 
-1. Agent machine is powered off.
-2. Network issue between the controller and the agent.
-3. SSH connection failure.
-4. Java process stopped.
-5. Disk space is full.
-6. CPU or memory exhausted.
-7. Jenkins agent service stopped.
-8. Credentials changed or expired.
-9. Kubernetes agent Pod crashed (if using dynamic agents).
+* Agent machine is powered off.
+* Network issue between the controller and the agent.
+* SSH connection failure.Java process stopped.
+* Disk space is full. CPU or memory exhausted.
+* Jenkins agent service stopped. Credentials changed or expired.
+* Kubernetes agent Pod crashed (if using dynamic agents).
 
 1. **Is the machine reachable?** (Network)
 2. **Is the required service running?** (Jenkins agent, Java)
@@ -66,19 +63,14 @@ A senior engineer should think about several possibilities, such as:
 ```bash
 # On the agent machine:
 systemctl status jenkins-agent
-
 # Check Java:
 java -version
-
 # Check disk usage:
 df -h
-
 # Check memory:
 free -m
-
 # Check CPU:
 top
-
 # Check if the machine is reachable:
 ping <agent-ip>
 ```
@@ -100,20 +92,6 @@ Secret File
 SSH Private Key
 AWS Credentials (through plugins or username/secret combinations)
 #### 6. Your Jenkins build is stuck in the 'Pending' state and never starts. What are the possible reasons, and how would you troubleshoot it?
-## Interview Evaluation
-
-### **Overall Score: 6.9/10**
-
-| Category            |    Score |
-| ------------------- | -------: |
-| Technical Accuracy  | **7/10** |
-| Communication       | **7/10** |
-| Confidence          | **8/10** |
-| Interview Readiness | **6/10** |
-
-This is one of those interview questions where the **keyword is very important**.
-
-The question was:
 
 > **"The Jenkins build is in the Pending state and never starts."**
 
