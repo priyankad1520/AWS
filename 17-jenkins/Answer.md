@@ -93,131 +93,22 @@ SSH Private Key
 AWS Credentials (through plugins or username/secret combinations)
 #### 6. Your Jenkins build is stuck in the 'Pending' state and never starts. What are the possible reasons, and how would you troubleshoot it?
 
-> **"The Jenkins build is in the Pending state and never starts."**
-
-But your answer focused on **a build that has already started and failed**.
-
-Those are two different scenarios.
-
----
-
-# ❌ What You Missed
-
-If a build is **Pending**, Jenkins has **not started executing the pipeline yet**.
-
-So the problem is **before the first stage**.
-
-The Docker build, SonarQube, Maven, Trivy, etc., haven't even started.
-
----
-
-## What the interviewer expects
-
-When a Jenkins build is **Pending**, think about:
-
-### 1. No available Jenkins Agent ⭐⭐⭐⭐⭐
-
-This is the **most common answer**.
-
-Example:
-
-* Agent is offline
-* Agent disconnected
-* Agent is busy
-* Wrong agent label
-
----
-
-### 2. Executor is Busy
-
-Suppose your Jenkins has:
-
-```
-2 Executors
-```
-
-Both are already running builds.
-
-Your new build waits in **Pending**.
-
----
-
-### 3. Wrong Agent Label
-
-Example:
-
-Pipeline:
-
-```groovy
-agent { label 'docker' }
-```
-
-But there is **no agent** with the label `docker`.
-
-The job will remain Pending forever.
-
----
-
-### 4. Agent Offline
-
-Go to
-
-```
-Manage Jenkins
-→ Nodes
-```
-
-Check whether the agent is Offline.
-
----
-
-### 5. Queue
-
-Go to
-
-```
-Build Queue
-```
-
-See why Jenkins is waiting.
-
----
-
-### 6. Resources
-
-Sometimes
-
-* CPU
-* Memory
-* Disk
-
-are exhausted on the Jenkins agent.
-
----
-
-# Interview-Ready Answer (10/10)
-
 > "If a Jenkins build remains in the Pending state, first I check the Build Queue to understand why it hasn't started. Then I verify whether the required Jenkins agent is online and available. I also confirm that the pipeline is requesting the correct agent label and that a matching agent exists. Next, I check whether all executors are busy, which can cause new builds to wait in the queue. I also review the agent logs and verify that the agent has sufficient CPU, memory, and disk space. If the agent is disconnected or the label is incorrect, I fix the issue and rerun the build. Once the build starts successfully, I monitor the pipeline to ensure it completes without errors."
 
----
+**"If a Jenkins build is stuck in the pending state and never starts, the first thing I check is whether a suitable Jenkins agent is available. The most common reasons are that the agent is offline, disconnected, busy, or the pipeline is configured with an incorrect agent label.**
 
-# Interviewer's Verdict
+**First, I check whether the Jenkins agent is offline by navigating to `Manage Jenkins` → `Nodes` and verifying the agent status. If the agent is offline or disconnected, I identify the reason, restart the agent if required, and reconnect it to the Jenkins controller.**
 
-⚠️ **Needs Improvement**
+**Next, I check whether all executors on the agent are already occupied. For example, if an agent has only two executors and both are running builds, any new build will remain in the pending state until an executor becomes available.**
 
-This wasn't because your Jenkins knowledge is weak.
+**Then, I verify the agent label configured in the pipeline. If the pipeline requests an agent with a label such as `docker`, but no Jenkins agent is configured with that label, the build will remain pending indefinitely.**
 
-It happened because you answered a **different problem**.
+**I also check the Jenkins build queue to understand why the build is waiting. The queue usually provides useful information, such as waiting for the next available executor or waiting for a matching agent.**
 
-A very common interview mistake is missing one keyword.
+**Finally, I verify the agent's CPU, memory, and disk utilization because resource exhaustion can make the agent unavailable for new builds. If necessary, I free up resources, restart the agent, or provision additional agents to handle the workload.**
 
----
+**In our project, I would first check the agent status, build queue, executor availability, agent labels, and resource utilization. After resolving the root cause, I would rerun the build and monitor it to ensure it starts successfully."**
 
-## 🔥 Interview Tip
-
-Whenever you're asked a troubleshooting question, first identify **which stage** the issue is in.
-
-For example:
 
 | Question             | Think About                   |
 | -------------------- | ----------------------------- |
@@ -228,10 +119,9 @@ For example:
 | Deployment failed    | Kubernetes, Helm, EKS         |
 | Pod CrashLoopBackOff | Logs, application             |
 
-This habit will help you answer much more accurately.
 
 ---
-#### 7. What is the difference between `agent any`, `agent none`, and `agent { label 'docker' }` in a Declarative Jenkins Pipeline?"agent any means Jenkins can execute the pipeline on any available agent, so Jenkins automatically selects one. agent none means no agent is allocated for the entire pipeline. Instead, each stage must define its own agent, which is useful when different stages require different environments. agent { label 'docker' } tells Jenkins to run the pipeline or a specific stage only on an agent that has the label docker. In our project, we mainly used labeled agents to ensure Docker builds and Kubernetes deployments ran on machines with the required tools installed.
+#### 7. What is the difference between `agent any`, `agent none`, and `agent { label 'docker' }` in a Declarative Jenkins Pipeline?"
 agent any means Jenkins can execute the pipeline on any available agent, so Jenkins automatically selects one. agent none means no agent is allocated for the entire pipeline. Instead, each stage must define its own agent, which is useful when different stages require different environments. agent { label 'docker' } tells Jenkins to run the pipeline or a specific stage only on an agent that has the label docker. In our project, we mainly used labeled agents to ensure Docker builds and Kubernetes deployments ran on machines with the required tools installed.
 ```groovy
 pipeline {
