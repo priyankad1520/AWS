@@ -65,17 +65,11 @@ done
 kubectl get hpa -w
 kubectl get pods -w
 ```
-This is actually an excellent format. I would even make one small change: put the **Interview Answer first**, then **Possible Causes → Investigation → Fixes → How to Fix**. That's exactly how interviewers think—they ask the question, expect a concise answer, and then drill into the details if needed.
-
-Here are **Problem 2** and **Problem 3** in the same format.
-
 ---
 
 # Problem 2: Scale-up is delayed
 
 > First, I'd verify whether the HPA has triggered a scale-up event using **kubectl describe hpa**. Then I'd check the current CPU or Memory utilization using **kubectl top pods** to confirm it has exceeded the configured threshold. If the HPA has already requested new replicas, I'd verify whether the new Pods are Pending due to insufficient cluster resources, image pull delays, or scheduling issues. Finally, I'd check whether the Cluster Autoscaler is provisioning a new node and validate that the new Pods become Ready and start receiving traffic.
-
----
 
 **Possible Causes:**
 
@@ -87,8 +81,6 @@ Here are **Problem 2** and **Problem 3** in the same format.
 * Application startup time is high.
 * Cluster Autoscaler is provisioning a new node.
 * Node resources are exhausted.
-
----
 
 **Investigation:**
 
