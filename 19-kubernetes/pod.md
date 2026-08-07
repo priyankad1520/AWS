@@ -1,6 +1,104 @@
 # Pod
 
-# Problem 1: Pod is in CrashLoopBackOff
+
+### Problem: Traffic is Not Distributed Equally Across Pods some pod 80% and 20%
+The key point is:
+
+* ✅ Pods are **Running**
+* ✅ Pods are **Ready**
+* ✅ No Pending Pods
+* ✅ No CrashLoopBackOff
+* ✅ Application is healthy
+* ❌ Traffic is not distributed equally
+
+This is **not a Pod problem**. It's usually related to the **Service, Ingress, Load Balancer, or application**.
+> First, I'd verify whether all Pods are in the **Running** and **Ready** state. Then I'd check whether the Service has active Endpoints for all Pods. Next, I'd verify the Service selector, Ingress configuration, and Load Balancer behavior. I'd also review the application for session persistence or uneven request handling. Based on the findings, I'd resolve the load balancing issue and validate that traffic is distributed evenly across all healthy Pods.
+> **"First, I'd verify that all Pods are Running and Ready because only Ready Pods receive traffic. Then I'd check whether the Service has Endpoints for all Pods and confirm that the Service selector matches the Pod labels. Next, I'd verify whether Session Affinity or sticky sessions are enabled at the Service, Ingress, or Load Balancer level. I'd also review the application for long-lived connections such as WebSockets or gRPC, which can naturally cause uneven traffic distribution. After fixing the root cause, I'd validate that traffic is evenly distributed across all healthy Pods."**
+
+**Possible Causes:**
+
+* Some Pods are not **Ready**, so they are removed from Service Endpoints.
+* Service selector does not match all Pod labels.
+* Service has missing Endpoints.
+* Session Affinity (`ClientIP`) is enabled.
+* Ingress sticky sessions are enabled.
+* Load Balancer session stickiness is enabled.
+* Application keeps long-lived connections (WebSocket, gRPC, HTTP Keep-Alive).
+* HPA recently created new Pods and traffic has not shifted yet.
+* One Pod is responding slowly, causing retries to other Pods.
+* Node-level imbalance (external Load Balancer sends more traffic to one node).
+* Application itself is routing requests internally.
+
+
+**Investigation:**
+
+```yaml
+kubectl get pods -o wide
+kubectl get svc
+kubectl describe svc <service-name>
+kubectl get endpoints <service-name>
+kubectl describe ingress <ingress-name>
+kubectl get endpointslices
+kubectl top pods
+```
+
+**Fixes:**
+
+* Ensure all Pods are Ready.
+* Correct the Service selector.
+* Restore missing Endpoints.
+* Disable Session Affinity if not required.
+* Disable sticky sessions in the Ingress.
+* Disable Load Balancer stickiness.
+* Review application connection handling.
+* Verify EndpointSlice distribution.
+
+## How to Fix
+
+```yaml
+# 1. Verify Pod Health
+kubectl get pods
+kubectl describe pod <pod-name>
+# Verify all Pods are Running and Ready.
+------------------------------------------------------------
+# 2. Verify Service Endpoints
+kubectl get endpoints <service-name>
+kubectl get endpointslices
+# Verify all Pod IPs are registered.
+------------------------------------------------------------
+# 3. Verify Service Configuration
+kubectl describe svc <service-name>
+# Verify Selector, SessionAffinity, Ports.
+------------------------------------------------------------
+# 4. Verify Ingress
+kubectl describe ingress <ingress-name>
+# Check Sticky Session annotations.
+------------------------------------------------------------
+# 5. Verify Load Balancer
+# Check Session Stickiness configuration (AWS ALB/NLB, Azure, GCP).
+------------------------------------------------------------
+# 6. Verify Application
+kubectl logs <pod-name>
+# Check long-lived connections, WebSocket, gRPC.
+------------------------------------------------------------
+# 7. Validate
+kubectl get endpoints
+kubectl top pods
+# Verify traffic is distributed across all Pods.
+```
+
+
+---
+
+
+1. **Session Affinity enabled** (`sessionAffinity: ClientIP`)
+2. **Ingress sticky sessions**
+3. **AWS ALB sticky sessions**
+4. **Some Pods are Not Ready** (therefore not in Endpoints)
+5. **Service selector mismatch**
+6. **Long-lived connections (WebSocket/gRPC)**
+
+### Problem 1: Pod is in CrashLoopBackOff
 
 > First, I'd check the Pod status using **kubectl get pods** to confirm it's in a CrashLoopBackOff state. Then I'd inspect the Pod events using **kubectl describe pod** and review the container logs using **kubectl logs** to identify why the application is crashing. Next, I'd verify the container image, startup command, ConfigMaps, Secrets, resource limits, and external dependencies such as the database or APIs. Based on the root cause, I'd fix the configuration or application issue, redeploy the Pod, and verify that it reaches the **Running** and **Ready** state without further restarts.
 
