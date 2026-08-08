@@ -2,7 +2,6 @@
 ### Problem 1: Node is NotReady
 
 > First, I'd verify the node status using **kubectl get nodes** to confirm it's in the **NotReady** state. Then I'd inspect the node using **kubectl describe node** to identify any resource pressure or condition failures. Next, I'd verify the kubelet service, container runtime, node network connectivity, and system logs. Based on the findings, I'd restore the node to a healthy state and validate that it becomes **Ready** and starts scheduling Pods again.
-> **"First, I'd verify that the node is in the NotReady state using `kubectl get nodes`. Then I'd inspect the node conditions using `kubectl describe node` and verify the kubelet service, container runtime, and node resource utilization. Next, I'd review the kubelet logs and check network connectivity with the control plane. After resolving the underlying issue, I'd validate that the node returns to the Ready state and resumes scheduling Pods."**
 
 **Possible Causes:**
 
@@ -16,17 +15,6 @@
 * Certificate expired.
 * Node rebooted unexpectedly.
 
-**Investigation:**
-
-```yaml
-kubectl get nodes
-kubectl describe node <node-name>
-systemctl status kubelet
-systemctl status containerd
-journalctl -u kubelet
-df -h
-free -h
-```
 
 **Fixes:**
 
@@ -38,7 +26,7 @@ free -h
 * Renew certificates if required.
 * Rejoin the node if necessary.
 
-### How to Fix
+### How to Fix and Investigation
 
 ```yaml
 # 1. Verify Node Status
@@ -72,7 +60,6 @@ kubectl get nodes
 ### Problem 2: Node is in DiskPressure
 
 > First, I'd verify the node conditions using **kubectl describe node** to confirm the DiskPressure status. Then I'd inspect the disk utilization on the worker node and identify whether container images, logs, or temporary files are consuming excessive storage. Based on the findings, I'd free disk space and validate that the node returns to a healthy state.
-> **"First, I'd verify the DiskPressure condition using `kubectl describe node`. Then I'd inspect the node's disk usage and identify whether container images, logs, or temporary files are consuming excessive storage. After cleaning up unnecessary files or increasing disk capacity, I'd validate that the DiskPressure condition is cleared and the node returns to the Ready state."**
 
 **Possible Causes:**
 
@@ -82,15 +69,6 @@ kubectl get nodes
 * Ephemeral storage exhausted.
 * Too many unused volumes.
 
-**Investigation:**
-
-```yaml
-kubectl describe node <node-name>
-df -h
-du -sh /var/lib/containerd/*
-journalctl --disk-usage
-crictl images
-```
 
 **Fixes:**
 
@@ -100,7 +78,7 @@ crictl images
 * Increase disk capacity.
 * Configure log rotation.
 
-### How to Fix
+### How to Fix and Investigation:
 
 ```yaml
 # 1. Verify Node Condition
@@ -129,7 +107,6 @@ kubectl get nodes
 ### Problem 3: Node is in MemoryPressure
 
 > First, I'd verify the node conditions using **kubectl describe node** to confirm the MemoryPressure status. Then I'd inspect the node's memory utilization and identify Pods consuming excessive memory. Next, I'd verify the resource requests and limits. Based on the findings, I'd optimize memory usage or increase node capacity.
-> **"First, I'd verify the MemoryPressure condition using `kubectl describe node`. Then I'd inspect the node's memory usage and identify Pods consuming excessive memory. Next, I'd review the resource requests and limits and optimize the workload or increase node capacity. Finally, I'd validate that the MemoryPressure condition is cleared."**
 
 **Possible Causes:**
 
@@ -139,15 +116,6 @@ kubectl get nodes
 * Incorrect resource limits.
 * Too many Pods on the node.
 
-**Investigation:**
-
-```yaml
-kubectl describe node <node-name>
-free -h
-kubectl top nodes
-kubectl top pods
-ps aux --sort=-%mem
-```
 
 **Fixes:**
 
@@ -157,7 +125,7 @@ ps aux --sort=-%mem
 * Move workloads to other nodes.
 * Enable Cluster Autoscaler.
 
-### How to Fix
+### How to Fix and Investigation:
 
 ```yaml
 # 1. Verify Node Condition
@@ -187,7 +155,6 @@ kubectl get nodes
 ### Problem 4: Node NetworkUnavailable
 
 > First, I'd verify the node conditions using **kubectl describe node** and confirm the NetworkUnavailable status. Then I'd inspect the CNI plugin, node network configuration, and connectivity with the control plane. Based on the findings, I'd restore the node network and validate that the node becomes Ready.
-> **"First, I'd verify the NetworkUnavailable condition using `kubectl describe node`. Then I'd inspect the CNI plugin, node network configuration, and routing. Next, I'd verify connectivity with the Kubernetes API server. After resolving the network issue, I'd validate that the node becomes Ready and resumes normal operation."**
 
 **Possible Causes:**
 
@@ -197,16 +164,6 @@ kubectl get nodes
 * Firewall blocking traffic.
 * Control plane connectivity issue.
 
-**Investigation:**
-
-```yaml
-kubectl describe node <node-name>
-kubectl get pods -n kube-system
-ip addr
-ip route
-ping <api-server>
-```
-
 **Fixes:**
 
 * Restart the CNI plugin.
@@ -215,7 +172,7 @@ ping <api-server>
 * Restore network connectivity.
 * Restart node networking services.
 
-### How to Fix
+### How to Fix and Investigation:
 
 ```yaml
 # 1. Verify Node Condition
@@ -244,7 +201,6 @@ kubectl get nodes
 ### Problem 5: Node Unreachable
 
 > First, I'd verify that the node is unreachable using **kubectl get nodes** and inspect the node conditions using **kubectl describe node**. Then I'd check whether the node itself is reachable through SSH and verify the kubelet service, container runtime, and network connectivity. Based on the findings, I'd restore connectivity and validate that the node reconnects to the cluster.
-> **"First, I'd verify that the node is unreachable using `kubectl get nodes` and inspect its conditions. Then I'd check whether I can access the node through SSH and verify the kubelet service, container runtime, and network connectivity. After restoring the node or network connectivity, I'd validate that the node reconnects to the cluster and returns to the Ready state."**
 
 **Possible Causes:**
 
@@ -255,17 +211,6 @@ kubectl get nodes
 * Cloud instance failure.
 * Firewall blocking communication.
 
-**Investigation:**
-
-```yaml
-kubectl get nodes
-kubectl describe node <node-name>
-systemctl status kubelet
-systemctl status containerd
-ping <node-ip>
-ssh <node-ip>
-```
-
 **Fixes:**
 
 * Restart the node.
@@ -275,7 +220,7 @@ ssh <node-ip>
 * Recover the cloud instance.
 * Update firewall rules.
 
-### How to Fix
+### How to Fix and Investigation:
 
 ```yaml
 # 1. Verify Node Status
@@ -323,7 +268,6 @@ Control Plane Connectivity
 ### Problem 1: Pod Cannot Communicate with Another Pod
 
 > First, I'd verify that both Pods are in the **Running** state and inspect their IP addresses. Then I'd test connectivity between the Pods using **ping**, **curl**, or **nc**. Next, I'd verify the Service, Endpoints, NetworkPolicy, CNI plugin, and DNS resolution. Based on the findings, I'd resolve the networking issue and validate that the Pods can communicate successfully.
-> **"First, I'd verify that both Pods are Running and test Pod-to-Pod connectivity using `ping` or `curl`. Then I'd check the Service, Endpoints, and NetworkPolicy to ensure traffic is allowed. Next, I'd verify the CNI plugin and routing configuration. After resolving the issue, I'd validate that the Pods can communicate successfully."**
 
 **Possible Causes:**
 
@@ -334,18 +278,6 @@ Control Plane Connectivity
 * Incorrect Service selector.
 * Firewall or routing issue.
 
-**Investigation:**
-
-```yaml
-kubectl get pods -o wide
-kubectl exec -it <pod-name> -- ping <pod-ip>
-kubectl exec -it <pod-name> -- curl http://<pod-ip>:<port>
-kubectl get svc
-kubectl get endpoints
-kubectl get networkpolicy
-kubectl get pods -n kube-system
-```
-
 **Fixes:**
 
 * Start the destination Pod.
@@ -355,7 +287,7 @@ kubectl get pods -n kube-system
 * Restart the CNI plugin.
 * Fix routing or firewall issues.
 
-### How to Fix
+### How to Fix and Investigation:
 
 ```yaml
 # 1. Verify Pod Status
@@ -390,7 +322,6 @@ kubectl exec -it <pod-name> -- curl http://<destination-pod-ip>:<port>
 ### Problem 2: DNS Resolution Failed
 
 > First, I'd verify whether DNS resolution is failing by using **nslookup** or **dig** from inside the Pod. Then I'd inspect the CoreDNS Pods and confirm that the DNS Service is running correctly. Next, I'd verify the Pod's DNS configuration and network connectivity. Based on the findings, I'd restore DNS functionality and validate that service names resolve successfully.
-> **"First, I'd verify DNS resolution from inside the Pod using `nslookup`. Then I'd check whether the CoreDNS Pods and the DNS Service are healthy. Next, I'd review the CoreDNS logs and ensure that NetworkPolicies are not blocking DNS traffic. After restoring DNS functionality, I'd validate that Service names resolve successfully."**
 
 **Possible Causes:**
 
@@ -401,16 +332,6 @@ kubectl exec -it <pod-name> -- curl http://<destination-pod-ip>:<port>
 * CNI networking issue.
 * Incorrect DNS configuration in the Pod.
 
-**Investigation:**
-
-```yaml
-kubectl exec -it <pod-name> -- nslookup kubernetes.default
-kubectl get pods -n kube-system
-kubectl get svc -n kube-system
-kubectl logs -n kube-system <coredns-pod>
-kubectl describe pod <pod-name>
-```
-
 **Fixes:**
 
 * Restart CoreDNS.
@@ -419,7 +340,7 @@ kubectl describe pod <pod-name>
 * Allow DNS traffic in NetworkPolicy.
 * Resolve CNI issues.
 
-### How to Fix
+### How to Fix and Investigation:
 
 ```yaml
 # 1. Verify DNS Resolution
@@ -448,7 +369,6 @@ kubectl exec -it <pod-name> -- nslookup <service-name>
 ### Problem 3: NetworkPolicy Blocking Traffic
 
 > First, I'd verify whether a NetworkPolicy exists in the namespace. Then I'd inspect the ingress and egress rules to determine whether traffic between the source and destination Pods is allowed. Next, I'd test connectivity from the source Pod. Based on the findings, I'd update the NetworkPolicy rules and validate that traffic flows successfully.
-> **"First, I'd verify whether a NetworkPolicy is applied to the namespace. Then I'd inspect the ingress and egress rules along with the Pod and namespace selectors. Next, I'd test connectivity between the Pods to confirm whether traffic is being blocked. After updating the policy to allow the required traffic, I'd validate that communication succeeds."**
 
 **Possible Causes:**
 
@@ -458,14 +378,6 @@ kubectl exec -it <pod-name> -- nslookup <service-name>
 * Incorrect namespace selector.
 * Required ports are not allowed.
 
-**Investigation:**
-
-```yaml
-kubectl get networkpolicy
-kubectl describe networkpolicy <policy-name>
-kubectl get pods --show-labels
-kubectl exec -it <pod-name> -- curl http://<destination-pod-ip>:<port>
-```
 **Fixes:**
 
 * Update ingress rules.
@@ -474,7 +386,7 @@ kubectl exec -it <pod-name> -- curl http://<destination-pod-ip>:<port>
 * Correct namespace selector.
 * Allow required ports.
 
-### How to Fix
+### How to Fix and Investigation:
 
 ```yaml
 # 1. Verify NetworkPolicy
@@ -503,7 +415,6 @@ kubectl exec -it <pod-name> -- curl http://<destination-pod-ip>:<port>
 ### Problem 4: CNI Plugin Issue
 
 > First, I'd verify whether the CNI plugin Pods are running in the **kube-system** namespace. Then I'd inspect the CNI logs and check the node network configuration. Next, I'd verify Pod IP allocation and Pod-to-Pod connectivity. Based on the findings, I'd restore the CNI plugin and validate that networking is functioning correctly across the cluster.
-> **"First, I'd verify that the CNI plugin Pods are running in the `kube-system` namespace. Then I'd inspect the CNI logs and node network configuration to identify networking or IP allocation issues. Next, I'd verify Pod IP addresses and test Pod-to-Pod connectivity. After restoring the CNI plugin, I'd validate that networking works correctly across the cluster."**
 
 **Possible Causes:**
 
@@ -514,16 +425,6 @@ kubectl exec -it <pod-name> -- curl http://<destination-pod-ip>:<port>
 * CNI daemon not running.
 * Version mismatch after cluster upgrade.
 
-**Investigation:**
-
-```yaml
-kubectl get pods -n kube-system
-kubectl logs -n kube-system <cni-pod>
-kubectl describe node <node-name>
-kubectl get pods -o wide
-ip addr
-ip route
-```
 **Fixes:**
 
 * Restart the CNI plugin.
@@ -532,7 +433,7 @@ ip route
 * Fix node network configuration.
 * Upgrade or reinstall the CNI plugin if required.
 
-### How to Fix
+### How to Fix and Investigation:
 
 ```yaml
 # 1. Verify CNI Pods
