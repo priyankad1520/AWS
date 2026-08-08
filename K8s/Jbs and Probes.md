@@ -612,3 +612,116 @@ In such cases, combine a **Startup Probe** or configure appropriate delays like 
 * It helps recover applications that are stuck, deadlocked, or unable to serve requests.
 * It is commonly implemented using **HTTP**, **TCP**, or **Exec** probes.
 * Incorrect Liveness Probe configuration can lead to unnecessary container restarts.
+**Readiness Probe:** It checks whether the **container is ready to receive traffic**. The container may be running, but the application could still be initializing, loading data, or connecting to a database. In that case, the readiness probe fails, and Kubernetes **removes the pod from the Service endpoints**, so traffic is not sent to it. The pod stays running and is **not restarted**. Once the probe succeeds, Kubernetes adds the pod back to traffic. This is very important during deployments because new pods can initialize without receiving traffic, helping achieve **zero-downtime deployments**.
+
+### Readiness Probe
+
+```yaml
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: 8080
+  periodSeconds: 5
+  failureThreshold: 2
+```
+**Readiness probe:** If `/ready` fails **2 consecutive times**, the pod is removed from traffic but **not restarted**.
+
+**Example:** Kubernetes checks `/ready` every 5 seconds. If it fails twice, the pod becomes **NotReady** and stops receiving traffic. Once it recovers, it is added back automatically.
+
+**Key difference:** Readiness failure means **stop traffic**, not restart the container.
+
+**Startup Probe:** It is used when an application takes a **long time to start**. Without a startup probe, the liveness probe might think the application is unhealthy during startup and restart it continuously. The startup probe tells Kubernetes, **“Give the application time to start.”** Until the startup probe succeeds, Kubernetes doesn't perform liveness or readiness checks. Once it succeeds once, the **liveness and readiness probes take over**. If the startup probe never succeeds within the configured limit, Kubernetes kills and restarts the container.
+
+### Startup Probe
+
+```yaml
+startupProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  periodSeconds: 5
+  failureThreshold: 30
+```
+
+**Startup probe:** `5 × 30 = 150 seconds` maximum startup time.
+**Example:** If the startup probe runs every 5 seconds with `failureThreshold: 30`, Kubernetes allows up to **150 seconds** for the application to start.
+
+There are **three common types of health probes**:
+
+1. **HTTP Probe** – Kubernetes sends an HTTP request to an endpoint. A response between **200–399** is considered successful. Best for **web applications and REST APIs**.
+2. **TCP Probe** – Kubernetes tries to establish a TCP connection to a port. If the connection succeeds, the probe passes. Best for **databases, caches, and services listening on a port**.
+3. **Exec Probe** – Kubernetes runs a **command inside the container** and checks the exit code. Best for **custom or complex health checks**.
+
+**Quick revision:**
+**Readiness → Can I receive traffic?**
+**Liveness → Am I alive or should I restart?**
+**Startup → Have I finished starting yet?**
+---
+### Failure Threshold
+The probe must fail **3 consecutive times** before Kubernetes takes action.
+```yaml
+failureThreshold: 3
+```
+### Success Threshold
+For a **readiness probe**, one successful check is enough to mark the pod as ready again.
+```yaml
+successThreshold: 1
+```
+### Initial Delay, Period & Timeout
+
+```yaml
+initialDelaySeconds: 30
+periodSeconds: 10
+timeoutSeconds: 5
+```
+* `initialDelaySeconds: 30` → Wait **30 seconds** before the first probe.
+* `periodSeconds: 10` → Run the probe every **10 seconds**.
+* `timeoutSeconds: 5` → If the probe doesn't respond within **5 seconds**, consider it a failure.
+
+```yaml
+# Real Example
+# Application startup = **30 seconds**
+# Health endpoint response = **1 second**
+
+initialDelaySeconds: 35
+periodSeconds: 10
+timeoutSeconds: 3
+# This gives the application enough time to start, checks it regularly, and allows up to **3 seconds** for the health-check response.
+```
+---
+### Post-Start Hook
+
+```yaml
+lifecycle:
+  postStart:
+    exec:
+      command: ["/bin/sh", "-c", "echo 'Initializing application'"]
+# Runs **immediately after the container starts**. Used for initialization, cache warm-up, or registering with service discovery.
+```
+
+### Pre-Stop Hook
+
+```yaml
+lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh", "-c", "sleep 60"]
+# Runs **before the container is terminated**. Used for graceful cleanup, closing connections, or allowing requests to finish.
+```
+
+
+
+### Graceful Shutdown
+
+```yaml
+terminationGracePeriodSeconds: 60
+
+lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh", "-c", "sleep 60"]
+# 
+`terminationGracePeriodSeconds` gives the application time to **shut down gracefully** before Kubernetes forcefully terminates it.
+```
+
+**Flow:** Pod Termination → SIGTERM → Pre-Stop Hook → Graceful Shutdown → Grace Period Ends → SIGKILL
