@@ -617,3 +617,73 @@ Local Browser → `localhost:8080` → Port Forward → Pod:80
 | `kubectl expose pod`       | Create a Service for a Pod             |
 | `kubectl delete service`   | Delete a Service                       |
 | `kubectl port-forward`     | Access a Pod locally without a Service |
+---
+### `kubectl get ingress`
+
+Lists all Ingress resources in the **current namespace**.
+
+```bash
+kubectl get ingress                                      # Lists Ingress resources with host, address, ports, and age.
+```
+
+* **HOSTS** → Domain handled by the Ingress.
+* **ADDRESS** → IP address/load balancer of the Ingress Controller.
+* **PORTS** → Usually `80` for HTTP and `443` for HTTPS.
+* **AGE** → How long the Ingress has existed.
+
+```text id="x6q2km"
+kubectl get ingress → Ingress Resource → Host + Address + Ports + Age
+```
+
+---
+
+### `kubectl describe ingress`
+
+Shows the **detailed configuration and events** of a specific Ingress.
+
+```bash id="p8m4zr"
+kubectl describe ingress my-app-ingress                 # Shows rules, TLS, annotations, backend, address, and events.
+```
+
+Useful for checking:
+
+* Host and path rules
+* Backend Service
+* TLS configuration
+* Annotations
+* Ingress address
+* **Events** and controller-related errors
+
+```text id="k7v3qn"
+Ingress → Describe → Rules + TLS + Backend + Annotations + Events
+```
+
+---
+
+### Check NGINX Ingress Controller Logs
+
+Controller logs help verify whether NGINX is **running correctly and processing the Ingress configuration**.
+
+```bash id="m5x9wd"
+kubectl logs -n ingress-nginx <nginx-controller-pod>        # Shows NGINX Ingress Controller logs.
+```
+
+You can use the logs to check for:
+
+* Controller startup
+* Ingress resource detection
+* Configuration/rewrite issues
+* SSL/TLS configuration
+* Routing-related errors
+
+```text id="q4n8zs"
+Ingress Created → NGINX Detects → Configuration Updated → Traffic Routed
+```
+
+### Quick Revision
+
+```text id="z3k6wp"
+get ingress → Basic Ingress Status
+describe ingress → Detailed Configuration + Events
+controller logs → Controller Processing + Errors
+```
