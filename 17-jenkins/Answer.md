@@ -1,3 +1,83 @@
+#### How exactly do you create a Jenkins Shared Library? Explain the folder structure, how you configure it in Jenkins, and how a Jenkinsfile calls that library.
+
+> "A **Jenkins Shared Library** is a Git repository where we keep reusable Jenkins pipeline logic, so that multiple projects don't need to maintain duplicate Jenkinsfiles. The standard structure mainly contains **`vars`**, **`src`**, and **`resources`** directories.
+>
+> In **`vars`**, we keep reusable **pipeline steps or global functions** that can be called directly from a Jenkinsfile. For example, we can have `buildApplication.groovy`, `dockerBuild.groovy`, `sonarScan.groovy`, or `deployToEKS.groovy`. If I define a function like `dockerBuild()`, different microservices can call the same function from their Jenkinsfiles.
+>
+> The **`src`** directory is used for reusable **Groovy classes and supporting business logic**. When the pipeline logic becomes more complex, instead of putting everything inside `vars`, we can create classes under `src`, which makes the code more modular and easier to maintain.
+>
+> The **`resources`** directory is used for **non-Groovy resource files**, such as pipeline templates, configuration files, shell scripts, or other static files required by the pipeline. These resources can be loaded from the Shared Library when the pipeline runs.
+>
+> For example, our structure could look like:
+>
+> `shared-library/ → vars/ → buildApplication.groovy, sonarScan.groovy, dockerBuild.groovy`
+>
+> `shared-library/ → src/ → com/company/DevOps/Deployment.groovy`
+>
+> `shared-library/ → resources/ → templates/ or configuration files`
+>
+> Then, in Jenkins, we configure this Git repository as a **Global Shared Library** or a folder-level Shared Library. In the individual microservice Jenkinsfile, we import the library and call the reusable functions.
+>
+> The main advantage is **standardization and reusability**. For example, if we have 15 microservices and all of them need the same SonarQube scan, Docker build, Trivy scan, and EKS deployment logic, we maintain that logic in one place instead of duplicating it across 15 Jenkinsfiles. When we improve or fix the common logic, we can update the Shared Library and roll out the change in a controlled way."
+
+**`vars` → reusable pipeline steps**
+**`src` → reusable Groovy classes/logic**
+**`resources` → templates/config/static files**
+#### How do you configure this Shared Library in Jenkins, and how do you call it from a Jenkinsfile?
+Yes. For this question, you should explain both **how the library is configured in Jenkins** and **how each Jenkinsfile consumes it**. Your idea about passing the image name as an argument is correct.
+
+A strong interview answer would be:
+
+> "First, we maintain our **Jenkins Shared Library in a Git repository**. In Jenkins, I go to **Manage Jenkins → System** and configure the library under **Global Pipeline Libraries**. I provide the library name, the Git repository URL, the credentials if the repository is private, and define the default branch or version. We can also enable automatic versioning so that pipelines can use a specific library version.
+>
+> Once the Shared Library is configured, each microservice Jenkinsfile can import it using the **`@Library`** annotation. Then instead of writing the complete Docker build logic in every Jenkinsfile, we call the reusable function from the Shared Library and pass the service-specific parameters.
+>
+> For example, if we have a reusable function called `dockerBuild`, the Jenkinsfile can call something like `dockerBuild(imageName: 'payment-service', tag: env.BUILD_NUMBER)`. The actual Docker build, tagging, and push logic is maintained inside the Shared Library.
+>
+> In the same way, we can create reusable functions for **Maven build, SonarQube scanning, Trivy scanning, ECR push, Helm deployment, or ArgoCD synchronization**. Each microservice only provides the values that are different, such as the application name, Docker image name, environment, namespace, or deployment configuration.
+>
+> This approach keeps the individual Jenkinsfiles very small, while the common CI/CD logic is centralized in the Shared Library. So if we need to change the Docker build or security scanning process, we update the Shared Library instead of modifying every microservice Jenkinsfile."
+
+### Simple example you can mention
+
+**Shared Library:**
+
+```text
+shared-library/
+├── vars/
+│   ├── dockerBuild.groovy
+│   ├── sonarScan.groovy
+│   └── deployToEKS.groovy
+├── src/
+└── resources/
+```
+
+**Jenkinsfile:**
+
+```groovy
+@Library('company-shared-library') _
+
+pipeline {
+    stages {
+        stage('Docker Build') {
+            steps {
+                script {
+                    dockerBuild(
+                        imageName: 'payment-service',
+                        tag: "${BUILD_NUMBER}"
+                    )
+                }
+            }
+        }
+    }
+}
+```
+
+The important interview point is:
+
+**Jenkins configuration → Git Shared Library → `@Library` → reusable function → pass service-specific parameters → common logic executes.**
+
+
 #### 1. Can you explain your Jenkins pipeline from the moment a developer pushes code to Git until the application is deployed to Kubernetes? Walk me through each stage and explain what happens.
 > When a developer pushes code to GitHub, a webhook automatically triggers the Jenkins pipeline. First, Jenkins checks out the latest source code from the repository. Next, Maven compiles the Java application and runs JUnit unit tests. After successful testing, SonarQube performs static code analysis to check code quality and security issues. If all quality gates pass, Maven packages the application into a JAR file. Then Jenkins builds a Docker image and scans it using Trivy for vulnerabilities. If the scan passes, the image is pushed to Amazon ECR. Finally, Jenkins updates the Kubernetes deployment on Amazon EKS using Helm or kubectl, allowing the new Pods to roll out. In the post stage, we send email notifications if the pipeline succeeds or fails.
 Git Webhook triggers Jenkins
