@@ -126,7 +126,20 @@ kubectl exec -it <pod-name> -- curl http://<service-name>:<port>
 
 ### Problem 4: Service Has No Endpoints
 
-> First, I'd verify whether the Service has any backend Endpoints using **kubectl get endpoints**. If no Endpoints are present, I'd compare the Service selector with the Pod labels and confirm that the Pods are in the Running and Ready state. Next, I'd verify that the Pods belong to the correct namespace. After fixing the selector or Pod issue, I'd validate that Endpoints are created and the Service starts routing traffic.
+> "**The pods may be Running but failing their readiness probe, so they aren't considered ready endpoints.**"
+
+Also, another very common cause is that the **Service selector itself is wrong** or the expected pods are in a different namespace. Remember, a Service selects pods **within its own namespace**.
+
+> "If `kubectl get endpoints` shows no endpoints, first I’ll check the **Service selector** and compare it with the labels on the backend pods. A selector-label mismatch is one of the most common causes.
+>
+> Then I’ll verify that the pods are actually **Running and Ready**, because a pod can be Running but still fail its **readiness probe**, so it won't be added as a ready endpoint. I’ll check the pod status and events for that.
+>
+> I’ll also verify that the Service and pods are in the **same namespace**, and check whether the Deployment or ReplicaSet currently has the expected number of replicas. If replicas are zero or all pods are unavailable, there will be no endpoints.
+>
+> Finally, I’ll fix the selector, labels, readiness issue, or replica problem based on the root cause, and verify again with `kubectl get endpoints` and test the Service from inside the cluster."
+
+**Service → selector → pod labels → same namespace → pod Ready → replicas → endpoints**
+
 
 | **Possible Causes**                        | **Fixes**                                              |
 | ------------------------------------------ | ------------------------------------------------------ |
@@ -162,6 +175,16 @@ kubectl exec -it <pod-name> -- curl http://<service-name>:<port>
 # Verify Endpoints are created and traffic is routed.
 ```
 **Service Troubleshooting Flow** : Service --> Selector --> Endpoints --> Pods (Running & Ready) -->Application Port --> NetworkPolicy / DNS
+### **"A pod is Running and Ready, the Service has endpoints, but the application is still not reachable from another pod in the same cluster. How would you troubleshoot it?"**
+If the source pod and destination pod are both healthy, the Service has endpoints, but communication is still failing, I’ll troubleshoot it layer by layer rather than assuming it's immediately a NetworkPolicy issue.
+
+First, I’ll test the destination Service DNS and port from the source pod using nslookup or curl. Then I’ll verify the Service port and targetPort, and make sure the application inside the destination pod is actually listening on that port.
+
+If the Service path fails, I’ll test the destination pod directly to determine whether the issue is with the Service or the application. After that, I’ll check whether any NetworkPolicy is blocking ingress or egress traffic, especially if the pods are in different namespaces.
+
+For EKS, I’ll also consider CNI/networking issues, security groups, and node-level network problems if the basic Kubernetes checks are clean.
+
+Once I identify the exact layer causing the connectivity failure, I’ll make the required change and then retest from the source pod to confirm end-to-end connectivity.
 
 ---
 # Ingress
