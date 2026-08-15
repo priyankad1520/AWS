@@ -1,4 +1,23 @@
 # Node
+### You are administering a production EKS cluster. Suddenly, one of the worker nodes goes into NotReady state, and several application pods are affected. How would you troubleshoot the issue, and what would you do to restore the application?
+First, I’ll identify the affected node using kubectl get nodes and confirm that it is in NotReady state. Then I’ll run kubectl describe node <node-name> to check the node conditions, events, pressure conditions like MemoryPressure, DiskPressure, PIDPressure, and any recent kubelet or networking errors.
+
+Since this is an EKS cluster, I’ll also check the underlying EC2 instance health, system status, CPU, memory, disk, and network connectivity, and verify whether the kubelet and container runtime are healthy. I’ll also check CloudWatch logs if we have node-level monitoring enabled.
+
+Next, I’ll identify which application pods are running on that node using kubectl get pods -A -o wide. If the node is unhealthy and the application needs immediate recovery, I’ll cordon the node to stop new pods from being scheduled there and, if it is safe, drain the node so workloads are rescheduled onto healthy nodes. Before draining, I’ll consider PodDisruptionBudgets and make sure sufficient capacity is available.
+
+After that, I’ll either recover the node or, if the EC2 instance itself has failed, replace the node through the EKS managed node group. Finally, I’ll verify that the node becomes Ready, the affected pods are running on healthy nodes, and application health, traffic, and monitoring are back to normal.
+
+So my priority is restore application availability first, then identify the root cause and take preventive action.
+```bash
+kubectl get nodes
+kubectl describe node <node-name>
+kubectl get pods -A -o wide
+kubectl cordon <node-name>
+kubectl drain <node-name> --ignore-daemonsets
+kubectl get events --sort-by=.lastTimestamp
+```
+Kubernetes node → kubelet/runtime → EC2 health → networking → capacity → pod rescheduling → application validation
 ### Problem 1: Node is NotReady
 
 > First, I'd verify the node status using **kubectl get nodes** to confirm it's in the **NotReady** state. Then I'd inspect the node using **kubectl describe node** to identify any resource pressure or condition failures. Next, I'd verify the kubelet service, container runtime, node network connectivity, and system logs. Based on the findings, I'd restore the node to a healthy state and validate that it becomes **Ready** and starts scheduling Pods again.
