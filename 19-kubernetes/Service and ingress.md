@@ -249,7 +249,11 @@ curl http://<host>
 
 ### Problem 3: Ingress Returns 503 Service Unavailable
 
-> **"First, I'd verify the Ingress configuration and backend Service. Then I'd check whether the Service has active Endpoints because a 503 error usually indicates that there are no healthy backend Pods available. Next, I'd verify the Deployment, Pod status, readiness probes, and Service selector. After restoring healthy backend Pods, I'd validate that the Ingress successfully routes traffic to the application."**
+> "First, I’ll identify where the 503 is coming from and trace the request path: Ingress or Load Balancer → Ingress Controller → Service → Endpoints → Pod.
+> I’ll first check whether the backend pods are Running and Ready using kubectl get pods. Then I’ll verify the Kubernetes Service and make sure the selector is matching the correct pods. I’ll check kubectl get endpoints to confirm the service actually has healthy backend endpoints.
+> Next, I’ll verify the Ingress backend configuration, including the service name and port, and compare the Service port and targetPort with the application port. I’ll also check the Ingress Controller logs and events to see whether it is reporting connection refused, no healthy upstreams, or another backend issue.
+> If required, I’ll test connectivity directly from inside the cluster to the Service. Once I identify whether it is a **readiness issue, service selector issue, endpoint issue, port mismatch, or ingress-controller problem**, I’ll fix it and then validate the request end-to-end.
+> Finally, I’ll verify that the application is returning a successful response through the Ingress and monitor the production traffic to make sure the 503s are resolved."
 
 | **Possible Causes**                   | **Fixes**                         |
 | ------------------------------------- | --------------------------------- |
