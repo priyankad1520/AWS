@@ -1,5 +1,19 @@
 # Deployment
+### A deployment was successful, all pods are Running and Ready, but after deployment users report that the new version is returning errors. What would you check first, and how would you decide whether to rollback?
+"First, I’ll confirm that the deployment itself is healthy by checking the pods, readiness status, rollout status, and deployment events. Since users are seeing errors after the new version, I’ll check the application logs and monitoring dashboards to understand what changed.
 
+Then I’ll compare the new version with the previous known-good deployment revision and check whether the errors started exactly after the rollout. I’ll also verify the application configuration, environment variables, Secrets, API dependencies, and database connectivity, because sometimes the deployment is technically successful but the application behavior is incorrect.
+
+If the issue is clearly introduced by the new release and is impacting production users, my priority is to restore service quickly. Based on our rollback procedure, I’ll roll back to the last known-good revision using something like kubectl rollout undo deployment/<name> or through our deployment tool. After rollback, I’ll verify that the pods are healthy, error rates return to normal, and users can access the application.
+
+Once service is stable, I’ll perform the root cause analysis with the development team and identify what needs to be fixed before redeploying."
+
+Deployment → Health → Logs/Metrics → Compare with previous revision → Identify impact → Rollback if required → Validate → RCA
+```bash
+kubectl rollout status deployment/<deployment-name>
+kubectl rollout history deployment/<deployment-name>
+kubectl rollout undo deployment/<deployment-name>
+```
 ### Problem 1: Deployment Replica Mismatch
 
 > First, I'd compare the desired and available replicas using **kubectl get deployment**. Then I'd inspect the Deployment using **kubectl describe deployment** to identify why the desired replicas are not matching the available replicas. Next, I'd verify the ReplicaSet, Pod status, scheduling events, image pull status, and readiness probes. Based on the root cause, I'd fix the issue and validate that all desired replicas become available successfully.
