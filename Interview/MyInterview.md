@@ -23,6 +23,7 @@
 23. How do you determine whether a subnet is public or private?
 24. nat gateway
 --- 
+#### betatestsolution
 1. What is a VPC?
 2. Why do we distinguish between public and private subnets?
 3. How can a private EC2 instance download Linux updates or patches?
@@ -66,3 +67,26 @@
 41. What would you use for monitoring?
 42. How would you configure a custom domain for the website?
 43. A Pod suddenly goes into CrashLoopBackOff after working fine for a week with no deployment. What would you check?
+---
+**Accion_labs**
+1. Explain your CI/CD process.
+2. You migrated workloads from ECS to EKS. What was the business problem with ECS? (You can answer that your project was already on EKS and not ECS.)
+3. The application was working perfectly on ECS, but after moving to EKS it started failing. How would you investigate?
+4. During a blue-green deployment, everything looks successful, but after 30 minutes customers report failures. What could have gone wrong?
+5. In Kubernetes, all pods are running and all nodes are healthy, but customers are getting 503 Service Unavailable. How would you investigate?
+6. One pod receives high traffic while another healthy pod receives very little traffic. What would you check?
+7. Tell me about a complex issue that was difficult to troubleshoot and resolve.
+8. Give another complex issue example.
+9. How would you prevent that issue from happening again?
+10. A user reports that records are not visible in the application. It could be a UI issue, API issue, or database issue. How would you isolate and troubleshoot it?
+11. A deployment works fine in Dev and QA, but after production deployment the application crashes due to real-time/live data. Have you faced such a scenario?
+12. Give another example of a production-only issue after deployment.
+13. Give a simple example of a production issue.
+14. Have you done SQL debugging? Give an example.
+15. A customer is very angry, management is on the bridge call, there is no ETA, and technical teams are struggling. How would you handle the customer and communication?
+16. Terraform apply succeeded yesterday, but today Terraform plan shows unexpected changes even though nobody changed the code. How would you investigate?
+17. What are the specific checks you would perform when Terraform plan shows unexpected changes?
+18. Only 3% of requests are failing. Pods, nodes, database, CPU, memory, and deployments all look normal. How would you investigate?
+19. What tools would you use when only a small percentage of requests are failing?
+20. Explain your troubleshooting approach from start to end for the 3% request failure scenario.
+21. AI is becoming popular in DevOps. How are you using AI tools in your current project or company?
