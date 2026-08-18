@@ -22,3 +22,47 @@
 22. How do you create public and private subnets?
 23. How do you determine whether a subnet is public or private?
 24. nat gateway
+--- 
+1. What is a VPC?
+2. Why do we distinguish between public and private subnets?
+3. How can a private EC2 instance download Linux updates or patches?
+4. What is NAT and what does it actually do?
+5. Why do we use a NAT Gateway instead of an Internet Gateway or Transit Gateway?
+6. How does a NAT Gateway allow a private EC2 instance to communicate with the internet?
+7. How do you connect two VPCs together?
+8. What happens if two VPCs have the same CIDR range during VPC peering?
+9. What type of applications have you deployed on Kubernetes/EKS?
+10. Which framework was used for the Java applications?
+11. What is the difference between ConfigMap and Secret?
+12. How did you integrate AWS Secrets Manager with EKS?
+13. What is IRSA and how did you implement it?
+14. What is the difference between Ingress, Service, and Deployment?
+15. Can a Pod have multiple containers?
+16. What are the different types of Kubernetes Services?
+17. How would you expose an application to the internet without ALB or NLB for testing?
+18. Have you worked on an EKS cluster version upgrade? How did you perform it?
+19. What is etcd?
+20. What happens to Pods when only a ConfigMap is changed and Helm is upgraded?
+21. What is a PersistentVolume and PersistentVolumeClaim?
+22. How would you establish a private connection between AWS and Azure?
+23. What is the difference between an IAM policy and a trust policy?
+24. Where is the trust policy defined?
+25. How did you set up IRSA using IAM roles and IAM policies?
+26. What happens if two engineers execute Terraform at the same time?
+27. What is the difference between terraform init, terraform plan, and terraform destroy?
+28. How do you implement namespace-based RBAC in EKS?
+29. Which AWS services have you worked with?
+30. For a production e-commerce application, which AWS services would you recommend?
+31. Where would you deploy the frontend?
+32. Where would you deploy the backend APIs—EC2, ECS, or Kubernetes?
+33. What replication/scaling strategy would you use for a high-traffic e-commerce application?
+34. How would you configure HPA/autoscaling for festive-season traffic?
+35. Why would you use Karpenter, and can we avoid it?
+36. What would you use for Redis?
+37. How would you handle background workers for payments and order processing?
+38. Can Lambda be used for background workers, and what are its disadvantages?
+39. What would you use for CI/CD?
+40. How would you secure secrets in Jenkins?
+41. What would you use for monitoring?
+42. How would you configure a custom domain for the website?
+43. A Pod suddenly goes into CrashLoopBackOff after working fine for a week with no deployment. What would you check?
