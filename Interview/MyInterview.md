@@ -1,3 +1,21 @@
+#### esyasoft
+
+1. **What is a Golden AMI, what goes into it, and how do you prevent it from becoming stale?**
+2. **Explain your current CI/CD flow/architecture.**
+3. **How do you push Docker images to Elastic Container Registry (ECR)?**
+4. **You're using EKS — what GitOps tool do you use, and how does Argo CD work?**
+5. **What is a Readiness Probe?**
+6. **What are Taints and Tolerations?**
+7. **How do GuardDuty, Security Hub, and Inspector differ? What does each detect that the others don't?**
+8. **How do you identify and remove unused IAM permissions from a role?**
+9. **What failure does Terraform remote-state locking with DynamoDB prevent?**
+10. **You migrated workloads from ECS to EKS. What was the biggest operational difference?**
+11. **For a stateful service with a database migration, would you choose Blue-Green or Canary, and why?**
+12. **Write shell logic to count EC2-related log lines containing `error` in the last hour.**
+13. **What is the `lsblk` command?**
+14. **What is the risk of making a Terraform module too generic/reusable across every environment?**
+---
+#### KPM
 1. Do you only deploy applications, or do you also create and administer EKS clusters?
 2. How do you access an EKS cluster?
 3. If I give you AWS Access Key and Secret Key, how do you identify and connect to the correct EKS cluster?
