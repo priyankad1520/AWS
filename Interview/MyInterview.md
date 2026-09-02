@@ -1,3 +1,44 @@
+#### FINEOS and client focus 
+21. **How do you create a Golden AMI?**
+22. **What kind of Python coding/scripting experience do you have, including Lambda functions?**
+23. **How would you structure reusable Terraform code for multiple environments?**
+24. **If the Terraform state file stored in S3 is deleted and S3 Versioning is not enabled, can it be recovered?**
+25. **Can the infrastructure be recreated if the Terraform state file is lost?**
+26. **If the state file is lost, what approach would you take to recover or recreate the infrastructure?**
+27. **How do you test Terraform code? What different Terraform testing strategies have you used?**
+28. **What do you work on in CI/CD, and what kind of pipeline have you defined?**
+29. **Have you written a pipeline that deploys a backend onto ECS/ECS Cluster?**
+30. **How do you connect Jenkins/CI-CD with the AWS account to deploy to EKS?**
+31. **What is a CNI plugin in Kubernetes?**
+32. **What is NetworkPolicy in Kubernetes?**
+33. **What is ingress and egress?**
+34. **What is network traffic?**
+35. **What is DNS in Kubernetes?**
+36. **How do you create a ServiceAccount?**
+37. **What things should be mentioned inside a ServiceAccount?**
+38. **What is your expertise in AWS? Which AWS services and tools have you worked on?**
+39. **Have you provisioned any VPC?**
+40. **What exactly do we use an Internet Gateway and NAT Gateway for?**
+41. **Why do we use a route table?**
+42. **What is a load balancer? What are the types of load balancers and what are they used for?**
+43. **For a banking application, which load balancer would be more feasible to use?**
+44. **Have you provisioned an EKS cluster?**
+45. **What are the components of the control plane/master node and worker node in EKS?**
+46. **When you run a `kubectl` command, what exactly happens and where does it fetch the data from?**
+47. **What are Authentication, Authorization, and Admission Control in Kubernetes?**
+48. **What exactly does Admission Control do?**
+49. **If a Pod needs to connect to S3, do we need PVCs and volumes, or how do we provide connectivity?**
+50. **Can we use an S3 endpoint in the Kubernetes Deployment file to connect a Pod to S3?**
+51. **Which DevOps tools have you worked with?**
+52. **How does CI start automatically when a developer pushes code to GitHub?**
+53. **What exactly have you worked on in Terraform?**
+54. **What is the Terraform state file, why is it important, and where should we keep it?**
+55. **If Terraform detects drift, how do you make sure it won't impact the current infrastructure?**
+56. **If three or four developers are working on the same Terraform code, should they use the same workspace or different workspaces?**
+57. **Where do you store the Terraform code at the end of the day when multiple developers are working on it?**
+58. **Why do we need a Terraform provider file and output file?**
+59. **How do you provision two EKS clusters in different AWS regions using only one reusable Terraform module?**
+60. **How do you use Prometheus, Grafana, and CloudWatch for monitoring?**
 #### esyasoft
 
 1. **What is a Golden AMI, what goes into it, and how do you prevent it from becoming stale?**
