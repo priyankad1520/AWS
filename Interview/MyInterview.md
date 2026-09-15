@@ -1,3 +1,97 @@
+### EPAM
+1. **What is the difference between NAT Gateway and VPC Endpoint?**
+
+2. **What kind of packages are installed in a NAT Gateway?**
+
+3. **What is AWS Lambda and how does it work?**
+
+4. **What is a Jenkins Shared Library? How do you create and configure it? Explain the folder structure.**
+
+5. **If you use a Shared Library and need a change only for one application, how do you manage it?**
+
+6. **Can you explain a normal Jenkins CI/CD pipeline?**
+
+7. **How would you run integration tests for a Node.js application across multiple Node versions and operating systems?**
+
+8. **How do you handle a monorepo where only the changed microservice should be built instead of the entire repository?**
+
+9. **What is an ephemeral Jenkins agent?**
+
+10. **How do you archive artifacts only for the main/release branch and not for feature branches?**
+
+11. **How do you connect Jenkins to AWS using short-lived/session-based credentials instead of access keys?**
+
+12. **What scripting languages have you used?**
+
+13. **How have you used Python with AWS Lambda?**
+
+14. **How do you establish connectivity between VPCs across multiple AWS accounts?**
+
+15. **How do you establish communication when two VPCs have overlapping CIDRs?**
+
+16. **How do you protect S3 audit logs from accidental deletion, even by the root user?**
+
+17. **How do you prevent developers from attaching AdministratorAccess to IAM roles across AWS Organization accounts?**
+
+18. **How do you troubleshoot an Auto Scaling Group that isn't scaling out during a traffic spike?**
+
+19. **What if CPU utilization never reaches the 80% scaling threshold even though traffic has increased significantly?**
+
+20. **How do you manage patching of multiple EC2 instances?**
+
+21. **How do you troubleshoot AccessDenied when an EC2 instance in Account A needs to upload data to an S3 bucket in Account B?**
+
+22. **What should you check if the EC2 IAM role already has S3 permissions but you're still getting AccessDenied?**
+
+23. **How do you configure the S3 bucket policy to allow cross-account access?**
+
+24. **How do you manage database passwords/API keys on EC2 without hardcoding them, while rotating credentials every 60 days without application downtime?**
+
+25. **How do you make sure secret rotation doesn't bring the application down?**
+
+26. **How do you manage secrets at runtime in Kubernetes using Secrets Manager/SDK/sidecar approaches?**
+
+27. **Have you handled Kubernetes cluster-level patching or version upgrades?**
+
+28. **An application takes 45–50 seconds to start, but the pod restarts every 30 seconds and enters CrashLoopBackOff. How do you fix it?**
+
+29. **How do you make sure three replicas of a deployment are scheduled on different nodes?**
+
+30. **How do you prevent one pod from consuming all node resources?**
+
+31. **How do you protect critical Kubernetes pods from eviction during node resource pressure?**
+
+32. **Have you worked with Terraform modules?**
+
+33. **How do you deploy the same Terraform VPC module across multiple AWS regions?**
+
+34. **How do you differentiate AWS regions using Terraform provider aliases?**
+
+35. **How do you prevent critical Terraform-managed resources such as VPC, EC2, RDS, and S3 from accidental deletion?**
+
+36. **What is a circular dependency in Terraform, and how do you resolve it?**
+
+37. **How do you manage secrets in Terraform without exposing them in logs or the Terraform state file?**
+
+38. **Does `sensitive = true` prevent secrets from being stored in Terraform state?**
+
+39. **Can you use a Terraform data block to retrieve secrets? Does it guarantee that the secret won't appear in state?**
+
+40. **How do you get a specific commit from another developer's branch into your branch?**
+
+41. **How do you temporarily save local Git changes without committing or pushing them?**
+
+42. **For a production environment, would you prefer Git merge or Git rebase?**
+
+43. **What is the difference between margin and markup?**
+
+44. **You get "No space left on device," but `df -h` shows only 50% disk usage. Why?**
+
+45. **How can a Linux filesystem have free disk space but still report "No space left on device"?**
+
+46. **How do you troubleshoot and remove zombie processes from a Linux server?**
+
+47. **Once you identify the parent PID of a zombie process, what commands do you use to handle it?**
 #### FINEOS and client focus 
 21. **How do you create a Golden AMI?**
 22. **What kind of Python coding/scripting experience do you have, including Lambda functions?**
