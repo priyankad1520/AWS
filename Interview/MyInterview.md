@@ -1,3 +1,34 @@
+1. Have you worked with enterprise-level Terraform deployments?
+2. How would you build a testing framework to validate Terraform infrastructure before deployment?
+3. How would you validate Terraform code before deployment?
+4. How would you design an automated remediation/self-healing system for an unhealthy EC2 instance?
+5. If someone manually changes Terraform-managed infrastructure from the AWS console, how would you remediate it?
+6. Have you worked with Kubernetes for several years?
+7. Pods are running and readiness probes are passing, but customers are getting HTTP 503. How would you troubleshoot it?
+8. What do error codes like exit code 0 and exit code 1 mean in pod logs?
+9. Pods are getting evicted from one worker node while other nodes have enough capacity. What could be the root cause?
+10. How would you check why a pod was evicted?
+11. What is an Ingress file?
+12. What is the Kubernetes pod lifecycle?
+13. Have you designed any self-healing systems?
+14. Have you worked on production troubleshooting and RCA?
+15. An upstream service is getting many retries because a downstream service is slow. The retries make the whole platform unavailable. How would you handle it?
+16. What experience do you have with monitoring tools like Grafana and Prometheus?
+17. What are the types of telemetry in monitoring?
+18. A developer adds customer ID and transaction ID as Prometheus labels and memory usage increases. How would you fix it?
+19. What types of labels do you see in a Grafana/Prometheus dashboard?
+20. A service generated 2,000–3,000 alerts/calls during a weekend but automatically recovered. How would you prevent this?
+21. Have you worked on performance and latency troubleshooting?
+22. What is the difference between P50 and P99 latency?
+23. If P50 latency is 100 ms but P99 is 8 seconds, what does that indicate?
+24. After enabling distributed tracing, P99 latency increased. What could be the reason?
+25. Have you worked in an L3/support role involving RCA?
+26. What would be your action items during the first 15 minutes of a P1 incident?
+27. A deployment caused an outage, but even after rollback the issue persists. What could be the reason?
+28. Cloud services need to connect to an on-premises database, but some services connect successfully while others get timeout errors. How would you troubleshoot it?
+29. Have you done end-to-end enterprise pipeline configuration?
+30. What are the stages of an enterprise CI/CD pipeline?
+31. What is sli slo sla
 ### EPAM
 1. **What is the difference between NAT Gateway and VPC Endpoint?**
 
